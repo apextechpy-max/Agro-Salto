@@ -6,7 +6,7 @@ router.use(authMiddleware);
 // ─── MASCOTAS ───────────────────────────────────────────────
 
 // Listar mascotas (con filtros)
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const { persona_id, q } = req.query;
   try {
     let sql = `SELECT m.*, p.razon_social as dueno_nombre, p.telefono as dueno_telefono
@@ -16,50 +16,53 @@ router.get('/', (req, res) => {
     const params = [];
 
     if (persona_id) {
-      sql += ' AND m.persona_id = ?';
+      sql += ` AND m.persona_id = $${params.length + 1}`;
       params.push(persona_id);
     }
     if (q) {
-      sql += ' AND (m.nombre LIKE ? OR m.especie LIKE ?)';
+      sql += ` AND (m.nombre ILIKE $${params.length + 1} OR m.especie ILIKE $${params.length + 2})`;
       params.push(`%${q}%`, `%${q}%`);
     }
 
     sql += ' ORDER BY m.nombre';
 
-    const rows = db.prepare(sql).all(...params);
-    res.json(rows);
+    const result = await db.query(sql, params);
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // Obtener mascota por ID (con historial de consultas)
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
-    const m = db.prepare(`SELECT m.*, p.razon_social as dueno_nombre, p.telefono as dueno_telefono, p.email as dueno_email
+    const result = await db.query(`SELECT m.*, p.razon_social as dueno_nombre, p.telefono as dueno_telefono, p.email as dueno_email
                           FROM mascotas m
                           LEFT JOIN personas p ON p.id = m.persona_id
-                          WHERE m.id = ?`).get(req.params.id);
+                          WHERE m.id = $1`, [req.params.id]);
+    const m = result.rows[0];
 
     if (!m) return res.status(404).json({ error: 'Mascota no encontrada' });
 
     // Consultas
-    const consultas = db.prepare(`SELECT c.*, u.nombre_completo as veterinario_nombre
+    const consultasRes = await db.query(`SELECT c.*, u.nombre_completo as veterinario_nombre
                                   FROM consultas c
                                   LEFT JOIN usuarios u ON u.id = c.veterinario_id
-                                  WHERE c.mascota_id = ?
+                                  WHERE c.mascota_id = $1
                                   ORDER BY c.fecha DESC
-                                  LIMIT 20`).all(m.id);
+                                  LIMIT 20`, [m.id]);
+    const consultas = consultasRes.rows;
 
     // Recetas para cada consulta
     for (const c of consultas) {
-      const recetas = db.prepare(`SELECT r.id, r.indicaciones
+      const recetasRes = await db.query(`SELECT r.id, r.indicaciones
                                    FROM recetas r
-                                   WHERE r.consulta_id = ?`).all(c.id);
+                                   WHERE r.consulta_id = $1`, [c.id]);
+      const recetas = recetasRes.rows;
       
       for (const r of recetas) {
-        const detalles = db.prepare('SELECT descripcion, cantidad, posologia FROM recetas_detalle WHERE receta_id = ?').all(r.id);
-        r.detalles = detalles;
+        const detallesRes = await db.query('SELECT descripcion, cantidad, posologia FROM recetas_detalle WHERE receta_id = $1', [r.id]);
+        r.detalles = detallesRes.rows;
       }
       c.recetas = recetas;
     }
@@ -72,29 +75,29 @@ router.get('/:id', (req, res) => {
 });
 
 // Crear mascota
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   const { persona_id, nombre, especie, raza, color, sexo, fecha_nacimiento, peso_kg, microchip, observaciones } = req.body;
   if (!persona_id || !nombre || !especie) return res.status(400).json({ error: 'persona_id, nombre y especie son requeridos' });
 
   try {
-    const r = db.prepare(`INSERT INTO mascotas (persona_id, nombre, especie, raza, color, sexo, fecha_nacimiento, peso_kg, microchip, observaciones)
-                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
+    const result = await db.query(`INSERT INTO mascotas (persona_id, nombre, especie, raza, color, sexo, fecha_nacimiento, peso_kg, microchip, observaciones)
+                          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`, [
       persona_id, nombre, especie, raza || null, color || null, sexo || 'DESCONOCIDO',
       fecha_nacimiento || null, peso_kg || null, microchip || null, observaciones || null
-    );
+    ]);
 
-    res.status(201).json({ id: r.lastInsertRowid });
+    res.status(201).json({ id: result.rows[0].id });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
 // Actualizar mascota
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   const { nombre, especie, raza, color, sexo, fecha_nacimiento, peso_kg, microchip, observaciones } = req.body;
   try {
-    db.prepare(`UPDATE mascotas SET nombre=?, especie=?, raza=?, color=?, sexo=?, fecha_nacimiento=?, peso_kg=?, microchip=?, observaciones=? WHERE id=?`)
-      .run(nombre, especie, raza || null, color || null, sexo || 'DESCONOCIDO', fecha_nacimiento || null, peso_kg || null, microchip || null, observaciones || null, req.params.id);
+    await db.query(`UPDATE mascotas SET nombre=$1, especie=$2, raza=$3, color=$4, sexo=$5, fecha_nacimiento=$6, peso_kg=$7, microchip=$8, observaciones=$9 WHERE id=$10`, 
+      [nombre, especie, raza || null, color || null, sexo || 'DESCONOCIDO', fecha_nacimiento || null, peso_kg || null, microchip || null, observaciones || null, req.params.id]);
 
     res.json({ ok: true });
   } catch (err) {
@@ -103,9 +106,9 @@ router.put('/:id', (req, res) => {
 });
 
 // Dar de baja mascota
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
-    db.prepare('UPDATE mascotas SET activa = 0 WHERE id = ?').run(req.params.id);
+    await db.query('UPDATE mascotas SET activa = 0 WHERE id = $1', [req.params.id]);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -113,10 +116,10 @@ router.delete('/:id', (req, res) => {
 });
 
 // Obtener mascotas de una persona
-router.get('/persona/:persona_id', (req, res) => {
+router.get('/persona/:persona_id', async (req, res) => {
   try {
-    const rows = db.prepare('SELECT * FROM mascotas WHERE persona_id = ? AND activa = 1 ORDER BY nombre').all(req.params.persona_id);
-    res.json(rows);
+    const result = await db.query('SELECT * FROM mascotas WHERE persona_id = $1 AND activa = 1 ORDER BY nombre', [req.params.persona_id]);
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

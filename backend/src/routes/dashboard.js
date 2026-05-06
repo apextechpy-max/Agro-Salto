@@ -3,37 +3,95 @@ const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 router.use(authMiddleware);
 
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
   const hoy = new Date().toISOString().split('T')[0];
   const filial_id = req.query.filial_id;
 
-  const ventasHoy = db.prepare(`SELECT COALESCE(SUM(total),0) as total, COUNT(*) as cant FROM ventas WHERE estado='COMPLETADA' AND date(fecha)=? ${filial_id ? 'AND filial_id=?' : ''}`).get(...(filial_id ? [hoy, filial_id] : [hoy]));
+  try {
+    // Ventas Hoy
+    let sqlVentasHoy = `SELECT COALESCE(SUM(total),0) as total, COUNT(*) as cant FROM ventas WHERE estado='COMPLETADA' AND fecha::date = $1`;
+    const paramsHoy = [hoy];
+    if (filial_id) {
+      sqlVentasHoy += ' AND filial_id = $2';
+      paramsHoy.push(filial_id);
+    }
+    const vHoyRes = await db.query(sqlVentasHoy, paramsHoy);
+    const ventasHoy = vHoyRes.rows[0];
 
-  const ventasMes = db.prepare(`SELECT COALESCE(SUM(total),0) as total FROM ventas WHERE estado='COMPLETADA' AND strftime('%Y-%m',fecha)=strftime('%Y-%m','now') ${filial_id ? 'AND filial_id=?' : ''}`).get(...(filial_id ? [filial_id] : []));
+    // Ventas Mes (Postgres style)
+    let sqlVentasMes = `SELECT COALESCE(SUM(total),0) as total FROM ventas WHERE estado='COMPLETADA' AND date_trunc('month', fecha) = date_trunc('month', CURRENT_DATE)`;
+    const paramsMes = [];
+    if (filial_id) {
+      sqlVentasMes += ' AND filial_id = $1';
+      paramsMes.push(filial_id);
+    }
+    const vMesRes = await db.query(sqlVentasMes, paramsMes);
+    const ventasMes = vMesRes.rows[0];
 
-  const stockCritico = db.prepare(`SELECT COUNT(*) as cant FROM stock s JOIN productos p ON p.id=s.producto_id WHERE s.cantidad<=p.stock_minimo AND p.activo=1 ${filial_id ? 'AND s.filial_id=?' : ''}`).get(...(filial_id ? [filial_id] : []));
+    // Stock Crítico
+    let sqlStockCrit = `SELECT COUNT(*) as cant FROM stock s JOIN productos p ON p.id=s.producto_id WHERE s.cantidad <= p.stock_minimo AND p.activo=1`;
+    const paramsStock = [];
+    if (filial_id) {
+      sqlStockCrit += ' AND s.filial_id = $1';
+      paramsStock.push(filial_id);
+    }
+    const sCritRes = await db.query(sqlStockCrit, paramsStock);
+    const stockCritico = sCritRes.rows[0];
 
-  const alertasVto = db.prepare(`SELECT COUNT(*) as cant FROM lotes WHERE estado='ACTIVO' AND cantidad_act>0 AND fecha_vto IS NOT NULL AND julianday(fecha_vto)-julianday('now')<=30 ${filial_id ? 'AND filial_id=?' : ''}`).get(...(filial_id ? [filial_id] : []));
+    // Alertas Vencimiento
+    let sqlAlertasVtoCount = `SELECT COUNT(*) as cant FROM lotes WHERE estado='ACTIVO' AND cantidad_act > 0 AND fecha_vto IS NOT NULL AND (fecha_vto - CURRENT_DATE) <= 30`;
+    const paramsVto = [];
+    if (filial_id) {
+      sqlAlertasVtoCount += ' AND filial_id = $1';
+      paramsVto.push(filial_id);
+    }
+    const vtoCountRes = await db.query(sqlAlertasVtoCount, paramsVto);
+    const alertasVto = vtoCountRes.rows[0];
 
-  const listaAlertasVto = db.prepare(`SELECT l.numero_lote, l.fecha_vto, p.nombre, CAST((julianday(l.fecha_vto)-julianday('now')) AS INTEGER) as dias FROM lotes l JOIN productos p ON p.id=l.producto_id WHERE l.estado='ACTIVO' AND l.cantidad_act>0 AND l.fecha_vto IS NOT NULL AND julianday(l.fecha_vto)-julianday('now')<=30 ${filial_id ? 'AND l.filial_id=?' : ''} ORDER BY l.fecha_vto ASC LIMIT 5`).all(...(filial_id ? [filial_id] : []));
+    // Lista Alertas Vto
+    let sqlAlertasList = `SELECT l.numero_lote, l.fecha_vto, p.nombre, (l.fecha_vto - CURRENT_DATE) as dias 
+      FROM lotes l JOIN productos p ON p.id=l.producto_id 
+      WHERE l.estado='ACTIVO' AND l.cantidad_act > 0 AND l.fecha_vto IS NOT NULL AND (l.fecha_vto - CURRENT_DATE) <= 30`;
+    const paramsList = [];
+    if (filial_id) {
+      sqlAlertasList += ' AND l.filial_id = $1';
+      paramsList.push(filial_id);
+    }
+    sqlAlertasList += ' ORDER BY l.fecha_vto ASC LIMIT 5';
+    const alertasListRes = await db.query(sqlAlertasList, paramsList);
+    const listaAlertasVto = alertasListRes.rows;
 
-  const deudoresTotal = db.prepare("SELECT COALESCE(SUM(saldo),0) as total FROM cuentas_corrientes WHERE tipo='COBRAR' AND estado!='PAGADO'").get();
+    // Deudores
+    const deudoresRes = await db.query("SELECT COALESCE(SUM(saldo),0) as total FROM cuentas_corrientes WHERE tipo='COBRAR' AND estado!='PAGADO'");
+    const deudoresTotal = deudoresRes.rows[0];
 
-  const top5Productos = db.prepare(`SELECT p.nombre, SUM(vd.cantidad) as total_vendido FROM ventas_detalle vd JOIN productos p ON p.id=vd.producto_id JOIN ventas v ON v.id=vd.venta_id WHERE v.estado='COMPLETADA' AND date(v.fecha)>=date('now','-30 days') GROUP BY p.id ORDER BY total_vendido DESC LIMIT 5`).all();
+    // Top 5 Productos (Last 30 days)
+    const top5Res = await db.query(`SELECT p.nombre, SUM(vd.cantidad) as total_vendido 
+      FROM ventas_detalle vd JOIN productos p ON p.id=vd.producto_id JOIN ventas v ON v.id=vd.venta_id 
+      WHERE v.estado='COMPLETADA' AND v.fecha::date >= (CURRENT_DATE - INTERVAL '30 days') 
+      GROUP BY p.id, p.nombre ORDER BY total_vendido DESC LIMIT 5`);
+    const top5Productos = top5Res.rows;
 
-  const ventasUltimos7 = db.prepare(`SELECT date(fecha) as dia, SUM(total) as total FROM ventas WHERE estado='COMPLETADA' AND date(fecha)>=date('now','-6 days') GROUP BY dia ORDER BY dia`).all();
+    // Ventas últimos 7 días
+    const v7Res = await db.query(`SELECT fecha::date as dia, SUM(total) as total 
+      FROM ventas WHERE estado='COMPLETADA' AND fecha::date >= (CURRENT_DATE - INTERVAL '6 days') 
+      GROUP BY dia ORDER BY dia`);
+    const ventasUltimos7 = v7Res.rows;
 
-  res.json({
-    ventasHoy: ventasHoy.total,
-    cantVentasHoy: ventasHoy.cant,
-    ventasMes: ventasMes.total,
-    stockCritico: stockCritico.cant,
-    alertasVto: alertasVto.cant,
-    listaAlertasVto,
-    deudoresTotal: deudoresTotal.total,
-    top5Productos,
-    ventasUltimos7
-  });
+    res.json({
+      ventasHoy: ventasHoy.total,
+      cantVentasHoy: ventasHoy.cant,
+      ventasMes: ventasMes.total,
+      stockCritico: stockCritico.cant,
+      alertasVto: alertasVto.cant,
+      listaAlertasVto,
+      deudoresTotal: deudoresTotal.total,
+      top5Productos,
+      ventasUltimos7
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 module.exports = router;

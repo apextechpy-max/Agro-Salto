@@ -5,28 +5,23 @@ const db = require('../db');
 const { SECRET } = require('../middleware/auth');
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { usuario, password } = req.body;
-  console.log(`尝试登录: ${usuario}`);
   
   if (!usuario || !password) {
-    console.log('Faltan credenciales');
     return res.status(400).json({ error: 'Credenciales requeridas' });
   }
 
   try {
-    const user = db.prepare('SELECT * FROM usuarios WHERE usuario = ? AND activo = 1').get(usuario);
-    console.log('Usuario encontrado en DB:', !!user);
+    const result = await db.query('SELECT * FROM usuarios WHERE usuario = $1 AND activo = 1', [usuario]);
+    const user = result.rows[0];
 
     if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-      console.log('Credenciales inválidas para:', usuario);
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
 
-    console.log('Login exitoso para:', usuario);
     // Actualizar último acceso
-    db.prepare('UPDATE usuarios SET ultimo_acceso = ? WHERE id = ?').run(new Date().toISOString(), user.id);
-
+    await db.query('UPDATE usuarios SET ultimo_acceso = $1 WHERE id = $2', [new Date().toISOString(), user.id]);
 
     const token = jwt.sign(
       { id: user.id, nombre: user.nombre_completo, usuario: user.usuario, perfil: user.perfil, filial_id: user.filial_id },
@@ -39,7 +34,6 @@ router.post('/login', (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
-
 
 // POST /api/auth/logout
 router.post('/logout', (req, res) => res.json({ ok: true }));
