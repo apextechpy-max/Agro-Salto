@@ -3,22 +3,14 @@
   "experimentalServices": {
     "frontend": {
       "root": "frontend",
+      "mount": "/",
       "installCommand": "npm install",
       "buildCommand": "npm run build"
     },
     "backend": {
       "root": "backend",
+      "mount": "/api",
       "installCommand": "npm install"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/backend/src/index.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/frontend/dist/$1"
-    }
-  ]
+  }
 }
