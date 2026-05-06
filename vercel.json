@@ -4,12 +4,14 @@
     "frontend": {
       "root": "frontend",
       "mount": "/",
+      "framework": "vite",
       "installCommand": "npm install",
       "buildCommand": "npm run build"
     },
     "backend": {
       "root": "backend",
       "mount": "/api",
+      "framework": "node.js",
       "installCommand": "npm install"
     }
   }
