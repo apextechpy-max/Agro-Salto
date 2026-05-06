@@ -7,7 +7,6 @@
     },
     "backend": {
       "entrypoint": "backend",
-      "framework": "other",
       "mount": "/_/backend"
     }
   }
