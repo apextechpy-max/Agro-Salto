@@ -1,18 +1,14 @@
 {
-  "version": 2,
   "experimentalServices": {
     "frontend": {
-      "root": "frontend",
-      "mount": "/",
+      "entrypoint": "frontend",
       "framework": "vite",
-      "installCommand": "npm install",
-      "buildCommand": "npm run build"
+      "mount": "/"
     },
     "backend": {
-      "root": "backend",
-      "mount": "/api",
-      "framework": "node.js",
-      "installCommand": "npm install"
+      "entrypoint": "backend",
+      "framework": "other",
+      "mount": "/_/backend"
     }
   }
 }
