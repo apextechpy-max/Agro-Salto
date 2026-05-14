@@ -7,8 +7,11 @@ function headers(extra = {}) {
 }
 
 async function req(method, path, body) {
-  const opts = { method, headers: headers() }
-  if (body !== undefined) opts.body = JSON.stringify(body)
+  const isFormData = body instanceof FormData
+  const h = headers()
+  if (isFormData) delete h['Content-Type']
+  const opts = { method, headers: h }
+  if (body !== undefined) opts.body = isFormData ? body : JSON.stringify(body)
   const res = await fetch(BASE + path, opts)
   const data = await res.json().catch(() => ({}))
   if (res.status === 401) {

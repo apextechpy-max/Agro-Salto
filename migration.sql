@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS productos (
     stock_minimo DECIMAL(15,2) DEFAULT 0,
     requiere_receta SMALLINT DEFAULT 0,
     tipo_inventario VARCHAR(20) DEFAULT 'AMBOS', -- CLINICA, PETSHOP, AMBOS
+    foto_url TEXT,
     activo SMALLINT DEFAULT 1,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

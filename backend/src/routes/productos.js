@@ -1,7 +1,36 @@
 const router = require('express').Router();
 const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
 router.use(authMiddleware);
+
+// Configuración de Multer para fotos de productos
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = 'uploads/productos';
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    cb(null, 'prod-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  fileFilter: (req, file, cb) => {
+    const allowed = /jpeg|jpg|png|webp/;
+    const mime = allowed.test(file.mimetype);
+    const ext = allowed.test(path.extname(file.originalname).toLowerCase());
+    if (mime && ext) return cb(null, true);
+    cb(new Error('Solo se permiten imágenes (jpg, png, webp)'));
+  }
+});
 
 // Función para autogenerar código de producto (PostgreSQL)
 async function generarCodigoProducto(tipo_inventario) {
@@ -77,19 +106,20 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', upload.single('foto'), async (req, res) => {
   const { nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario } = req.body;
   if (!nombre) return res.status(400).json({ error: 'Nombre es requerido' });
 
   try {
     const tipo = tipo_inventario || 'AMBOS';
     const codigo = await generarCodigoProducto(tipo);
+    const foto_url = req.file ? `/_/backend/uploads/productos/${req.file.filename}` : null;
     
-    const result = await db.query(`INSERT INTO productos (codigo, nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario)
-                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`, [
+    const result = await db.query(`INSERT INTO productos (codigo, nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario, foto_url)
+                          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, [
       codigo, nombre, descripcion || '', categoria_id || null, unidad_medida || 'UNIDAD',
       precio_costo || 0, precio_venta_menor || 0, precio_venta_mayor || 0,
-      iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, tipo
+      iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, tipo, foto_url
     ]);
 
     res.json({ id: result.rows[0].id, codigo });
@@ -98,18 +128,28 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', upload.single('foto'), async (req, res) => {
   const { nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, activo } = req.body;
   try {
-    await db.query(`UPDATE productos SET nombre=$1, descripcion=$2, categoria_id=$3, unidad_medida=$4, precio_costo=$5, precio_venta_menor=$6, precio_venta_mayor=$7, iva_tipo=$8, stock_minimo=$9, requiere_receta=$10, activo=$11 WHERE id=$12`, 
-      [
-        nombre, descripcion || '', categoria_id || null, unidad_medida || 'UNIDAD',
-        precio_costo || 0, precio_venta_menor || 0, precio_venta_mayor || 0,
-        iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, 
-        activo !== undefined ? (activo ? 1 : 0) : 1,
-        req.params.id
-      ]);
+    let foto_url = null;
+    let sql = `UPDATE productos SET nombre=$1, descripcion=$2, categoria_id=$3, unidad_medida=$4, precio_costo=$5, precio_venta_menor=$6, precio_venta_mayor=$7, iva_tipo=$8, stock_minimo=$9, requiere_receta=$10, activo=$11`;
+    const params = [
+      nombre, descripcion || '', categoria_id || null, unidad_medida || 'UNIDAD',
+      precio_costo || 0, precio_venta_menor || 0, precio_venta_mayor || 0,
+      iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, 
+      activo !== undefined ? (activo ? 1 : 0) : 1
+    ];
 
+    if (req.file) {
+      foto_url = `/_/backend/uploads/productos/${req.file.filename}`;
+      sql += `, foto_url=$${params.length + 1}`;
+      params.push(foto_url);
+    }
+
+    sql += ` WHERE id=$${params.length + 1}`;
+    params.push(req.params.id);
+
+    await db.query(sql, params);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

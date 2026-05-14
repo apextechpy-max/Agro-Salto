@@ -9,6 +9,15 @@ const PORT = process.env.PORT || 3001;
 // Permitir CORS en producción
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Asegurar que la carpeta de uploads existe
+const fs = require('fs');
+const uploadDir = path.join(__dirname, '../uploads/productos');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Init DB
 require('./db');

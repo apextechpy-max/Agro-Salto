@@ -115,13 +115,12 @@ export default function Productos() {
 
       let result
       if (editId) {
-        result = await api.updateProducto(editId, form)
-        // Si hay foto nueva, la subimos por separado (podemos extender luego)
+        result = await api.updateProducto(editId, formData)
         setMsg({ type: 'success', text: '✅ Producto actualizado correctamente' })
         setShowModal(false)
         load()
       } else {
-        result = await api.createProducto(form)
+        result = await api.createProducto(formData)
         const codigo = result?.codigo
         setMsg({ type: 'success', text: `✅ Producto creado — Código: ${codigo}` })
         setShowModal(false)
