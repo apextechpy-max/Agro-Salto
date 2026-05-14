@@ -5,6 +5,16 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 
 router.use(authMiddleware);
 
+// Lista pública de veterinarios (solo id + nombre) — accesible para todos los roles (necesario para Agenda)
+router.get('/veterinarios', async (req, res) => {
+  try {
+    const result = await db.query('SELECT id, nombre_completo FROM usuarios WHERE activo = 1 ORDER BY nombre_completo');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 router.get('/', requireRole('ADMIN'), async (req, res) => {
   try {
     const result = await db.query('SELECT id,nombre_completo,usuario,perfil,filial_id,activo,ultimo_acceso,creado_en FROM usuarios ORDER BY id');

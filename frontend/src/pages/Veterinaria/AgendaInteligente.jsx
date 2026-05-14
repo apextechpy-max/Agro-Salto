@@ -56,7 +56,7 @@ export default function AgendaInteligente() {
         api.agenda(`?desde=${desde}&hasta=${hasta}`),
         api.mascotas(),
         api.personas('?tipo=CLIENTE'),
-        api.usuarios()
+        api.veterinarios()
       ])
       setEventos(ev)
       setMascotas(m)

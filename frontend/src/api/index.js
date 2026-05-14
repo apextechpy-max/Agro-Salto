@@ -87,6 +87,7 @@ export const api = {
 
   // Usuarios
   usuarios: () => req('GET', '/usuarios'),
+  veterinarios: () => req('GET', '/usuarios/veterinarios'),
   createUsuario: (d) => req('POST', '/usuarios', d),
   updateUsuario: (id, d) => req('PUT', `/usuarios/${id}`, d),
   deleteUsuario: (id) => req('DELETE', `/usuarios/${id}`),

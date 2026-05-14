@@ -16,10 +16,20 @@ import CRMMascotas from './pages/Veterinaria/CRMMascotas'
 import AgendaInteligente from './pages/Veterinaria/AgendaInteligente'
 import ClinicaPanel from './pages/Veterinaria/ClinicaPanel'
 
+// Roles sin acceso a ciertas rutas
+const CAJERO_ROLES = ['CAJERO_1', 'CAJERO_2', 'CAJERO']
+
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <div className="loading-center"><div className="spinner" /></div>
   return user ? children : <Navigate to="/login" replace />
+}
+
+// Ruta protegida por rol: si el usuario tiene uno de los roles bloqueados, redirige al fallback
+function RoleRoute({ children, blockedRoles = [], fallback = '/ventas' }) {
+  const { user } = useAuth()
+  if (blockedRoles.includes(user?.perfil)) return <Navigate to={fallback} replace />
+  return children
 }
 
 export default function App() {
@@ -29,13 +39,25 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
-            <Route index element={<Dashboard />} />
+            <Route index element={
+              <RoleRoute blockedRoles={CAJERO_ROLES} fallback="/ventas">
+                <Dashboard />
+              </RoleRoute>
+            } />
             <Route path="ventas" element={<Ventas />} />
             <Route path="compras" element={<Compras />} />
-            <Route path="stock" element={<Stock />} />
+            <Route path="stock" element={
+              <RoleRoute blockedRoles={CAJERO_ROLES} fallback="/ventas">
+                <Stock />
+              </RoleRoute>
+            } />
             <Route path="caja" element={<Caja />} />
             <Route path="clientes" element={<Clientes />} />
-            <Route path="productos" element={<Productos />} />
+            <Route path="productos" element={
+              <RoleRoute blockedRoles={CAJERO_ROLES} fallback="/ventas">
+                <Productos />
+              </RoleRoute>
+            } />
             <Route path="usuarios" element={<Usuarios />} />
             <Route path="reportes" element={<Reportes />} />
             {/* Módulo Veterinario */}

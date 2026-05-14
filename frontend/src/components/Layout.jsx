@@ -5,7 +5,7 @@ import api from '../api'
 import logoImg from '../assets/medallon_final.png'
 
 const NAV_ITEMS = [
-  { to: '/', icon: '📊', label: 'Dashboard', exact: true },
+  { to: '/', icon: '📊', label: 'Dashboard', exact: true, roles: ['ADMIN', 'DEPOSITO'] },
   { to: '/ventas', icon: '🛒', label: 'Ventas' },
   { to: '/compras', icon: '📥', label: 'Compras', roles: ['ADMIN', 'DEPOSITO'] },
   { to: '/stock', icon: '📦', label: 'Stock', roles: ['ADMIN', 'DEPOSITO'] },
