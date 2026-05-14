@@ -15,8 +15,12 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 // Asegurar que la carpeta de uploads existe
 const fs = require('fs');
 const uploadDir = path.join(__dirname, '../uploads/productos');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (e) {
+  console.warn('⚠️ No se pudo crear el directorio local de uploads. Si estás en Vercel, usa Supabase Storage para los archivos.', e.message);
 }
 
 // Init DB
