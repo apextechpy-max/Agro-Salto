@@ -3,22 +3,17 @@ const db = require('../db');
 const { authMiddleware } = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const { createClient } = require('@supabase/supabase-js');
 
 router.use(authMiddleware);
 
-// Configuración de Multer para fotos de productos
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = 'uploads/productos';
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, 'prod-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+// Inicializar cliente de Supabase para Storage
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+
+// Usar memoria en lugar de disco, ya que Vercel es read-only
+const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage,
@@ -31,6 +26,29 @@ const upload = multer({
     cb(new Error('Solo se permiten imágenes (jpg, png, webp)'));
   }
 });
+
+// Función auxiliar para subir a Supabase Storage
+async function uploadToSupabase(file) {
+  if (!supabase) throw new Error('Supabase no está configurado (faltan variables de entorno)');
+  
+  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+  const fileName = 'prod-' + uniqueSuffix + path.extname(file.originalname);
+
+  const { data, error } = await supabase.storage
+    .from('productos')
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false
+    });
+
+  if (error) throw error;
+
+  const { data: publicData } = supabase.storage
+    .from('productos')
+    .getPublicUrl(fileName);
+
+  return publicData.publicUrl;
+}
 
 // Función para autogenerar código de producto (PostgreSQL)
 async function generarCodigoProducto(tipo_inventario) {
@@ -113,7 +131,11 @@ router.post('/', upload.single('foto'), async (req, res) => {
   try {
     const tipo = tipo_inventario || 'AMBOS';
     const codigo = await generarCodigoProducto(tipo);
-    const foto_url = req.file ? `/_/backend/uploads/productos/${req.file.filename}` : null;
+    
+    let foto_url = null;
+    if (req.file) {
+      foto_url = await uploadToSupabase(req.file);
+    }
     
     const result = await db.query(`INSERT INTO productos (codigo, nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario, foto_url)
                           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, [
@@ -141,7 +163,7 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
     ];
 
     if (req.file) {
-      foto_url = `/_/backend/uploads/productos/${req.file.filename}`;
+      foto_url = await uploadToSupabase(req.file);
       sql += `, foto_url=$${params.length + 1}`;
       params.push(foto_url);
     }
