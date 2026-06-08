@@ -52,7 +52,7 @@ async function uploadToSupabase(file) {
 
 // Función para autogenerar código de producto (PostgreSQL)
 async function generarCodigoProducto(tipo_inventario) {
-  const prefijos = { 'CLINICA': 'CLI', 'PETSHOP': 'PET', 'AMBOS': 'MIX' };
+  const prefijos = { 'CLINICA': 'CLI', 'PETSHOP': 'PET', 'FARMACIA': 'FAR' };
   const prefix = prefijos[tipo_inventario] || 'PRD';
   
   const result = await db.query('SELECT codigo FROM productos WHERE codigo LIKE $1 ORDER BY id DESC LIMIT 1', [`${prefix}-%`]);
@@ -129,7 +129,7 @@ router.post('/', upload.single('foto'), async (req, res) => {
   if (!nombre) return res.status(400).json({ error: 'Nombre es requerido' });
 
   try {
-    const tipo = tipo_inventario || 'AMBOS';
+    const tipo = tipo_inventario || 'FARMACIA';
     const codigo = await generarCodigoProducto(tipo);
     
     let foto_url = null;

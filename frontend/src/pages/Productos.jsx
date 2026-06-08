@@ -42,7 +42,7 @@ function BarcodeImg({ code, type = 'barcode' }) {
 }
 
 const EMPTY = {
-  tipo_inventario: 'AMBOS', nombre: '', descripcion: '',
+  tipo_inventario: 'FARMACIA', nombre: '', descripcion: '',
   unidad_medida: 'UNIDAD', precio_costo: 0, precio_venta_menor: 0,
   precio_venta_mayor: 0, iva_tipo: '10', stock_minimo: 0,
   requiere_receta: false, activo: true
@@ -82,7 +82,7 @@ export default function Productos() {
   }
 
   const openEdit = (p) => {
-    setForm({ ...p, activo: p.activo === 1, tipo_inventario: p.tipo_inventario || 'AMBOS' })
+    setForm({ ...p, activo: p.activo === 1, tipo_inventario: p.tipo_inventario || 'FARMACIA' })
     setEditId(p.id)
     setFotoPreview(p.foto_url || null)
     setFotoFile(null)
@@ -263,9 +263,9 @@ export default function Productos() {
               <input value={editId ? form.codigo : '— Autogenerado —'} disabled style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', fontWeight: 700 }} />
             </div>
             <div className="form-group">
-              <label>Tipo (Genera Código)</label>
+              <label>Categoría</label>
               <select value={form.tipo_inventario} onChange={e => setForm(f => ({ ...f, tipo_inventario: e.target.value }))} disabled={!!editId}>
-                <option value="AMBOS">Mixto (MIX)</option>
+                <option value="FARMACIA">Farmacia (FAR)</option>
                 <option value="CLINICA">Clínica (CLI)</option>
                 <option value="PETSHOP">Petshop (PET)</option>
               </select>
