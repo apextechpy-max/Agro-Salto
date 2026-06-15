@@ -245,17 +245,19 @@ async function main() {
           }
         }
 
+        const tInventario = (it.tipo_inventario || 'AMBOS').trim().toUpperCase();
+
         // 3. Si sigue sin existir pero tiene un nombre de producto, crearlo automáticamente
         if (!prodId && nomProd !== '') {
-          finalCodigo = await getNextCodigo('AMBOS'); // Default prefix PRD
+          finalCodigo = await getNextCodigo(tInventario);
           const prodInsert = await client.query(
             `INSERT INTO productos 
              (codigo, nombre, descripcion, unidad_medida, precio_costo, precio_venta_menor, iva_tipo, stock_minimo, tipo_inventario, activo) 
-             VALUES ($1, $2, 'AUTOCREADO DURANTE IMPORTACIÓN DE VENTAS', 'UNIDAD', 0, $3, $4, 0, 'AMBOS', 1) RETURNING id`,
-            [finalCodigo, nomProd, pUnit, ivaTipo]
+             VALUES ($1, $2, 'AUTOCREADO DURANTE IMPORTACIÓN DE VENTAS', 'UNIDAD', 0, $3, $4, 0, $5, 1) RETURNING id`,
+            [finalCodigo, nomProd, pUnit, ivaTipo, tInventario]
           );
           prodId = prodInsert.rows[0].id;
-          console.log(`✨ Producto autocreado en venta: [${finalCodigo}] ${nomProd}`);
+          console.log(`✨ Producto autocreado en venta: [${finalCodigo}] ${nomProd} (${tInventario})`);
         }
 
         // 4. Si no tiene ni código ni nombre, usar producto genérico
