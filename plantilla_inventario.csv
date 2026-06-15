@@ -1,0 +1,4 @@
+codigo;nombre;descripcion;categoria;unidad_medida;precio_costo;precio_venta_menor;precio_venta_mayor;iva_tipo;stock_minimo;tipo_inventario;stock_actual;numero_lote;fecha_vencimiento
+1001;Balanceado Perro Adulto 15kg;Alimento balanceado premium para perros;Alimentos;UNIDAD;120000;160000;150000;10;5;PETSHOP;25;LOTE-BP01;2027-05-20
+1002;Antiparasitario Canino;Comprimido masticable para pulgas y garrapatas;Farmacia;UNIDAD;45000;75000;70000;10;2;AMBOS;15;L-55443;2026-12-31
+1003;Shampoo Hipoalergénico 250ml;Shampoo para piel sensible de mascotas;Estética;UNIDAD;25000;40000;35000;10;3;PETSHOP;8;;

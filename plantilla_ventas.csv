@@ -1,0 +1,5 @@
+ticket;fecha;cliente;ruc_cliente;tipo_pago;codigo_producto;nombre_producto;cantidad;precio_unitario;iva_tipo;descuento_item
+V-0001;10/05/2026 09:30;;;CONTADO;1001;Balanceado Perro Adulto 15kg;2;160000;10;0
+V-0001;10/05/2026 09:30;;;CONTADO;1002;Antiparasitario Canino;1;75000;10;0
+V-0002;11/05/2026 11:15;María Cardozo;4433221-5;CREDITO;1003;Shampoo Hipoalergénico 250ml;1;40000;10;0
+V-0003;12/05/2026 16:45;;;CONTADO;;Servicios de Limpieza;1;150000;10;0

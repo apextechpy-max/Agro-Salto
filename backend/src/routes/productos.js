@@ -139,9 +139,19 @@ router.post('/', upload.single('foto'), async (req, res) => {
     
     const result = await db.query(`INSERT INTO productos (codigo, nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario, foto_url)
                           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, [
-      codigo, nombre, descripcion || '', categoria_id || null, unidad_medida || 'UNIDAD',
-      precio_costo || 0, precio_venta_menor || 0, precio_venta_mayor || 0,
-      iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, tipo, foto_url
+      codigo, 
+      nombre.trim().toUpperCase(), 
+      (descripcion || '').trim().toUpperCase(), 
+      categoria_id || null, 
+      (unidad_medida || 'UNIDAD').trim().toUpperCase(),
+      precio_costo || 0, 
+      precio_venta_menor || 0, 
+      precio_venta_mayor || 0,
+      iva_tipo || '10', 
+      stock_minimo || 0, 
+      requiere_receta ? 1 : 0, 
+      tipo, 
+      foto_url
     ]);
 
     res.json({ id: result.rows[0].id, codigo });
@@ -156,9 +166,16 @@ router.put('/:id', upload.single('foto'), async (req, res) => {
     let foto_url = null;
     let sql = `UPDATE productos SET nombre=$1, descripcion=$2, categoria_id=$3, unidad_medida=$4, precio_costo=$5, precio_venta_menor=$6, precio_venta_mayor=$7, iva_tipo=$8, stock_minimo=$9, requiere_receta=$10, activo=$11`;
     const params = [
-      nombre, descripcion || '', categoria_id || null, unidad_medida || 'UNIDAD',
-      precio_costo || 0, precio_venta_menor || 0, precio_venta_mayor || 0,
-      iva_tipo || '10', stock_minimo || 0, requiere_receta ? 1 : 0, 
+      nombre.trim().toUpperCase(), 
+      (descripcion || '').trim().toUpperCase(), 
+      categoria_id || null, 
+      (unidad_medida || 'UNIDAD').trim().toUpperCase(),
+      precio_costo || 0, 
+      precio_venta_menor || 0, 
+      precio_venta_mayor || 0,
+      iva_tipo || '10', 
+      stock_minimo || 0, 
+      requiere_receta ? 1 : 0, 
       activo !== undefined ? (activo ? 1 : 0) : 1
     ];
 

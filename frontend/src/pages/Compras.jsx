@@ -20,6 +20,7 @@ function Modal({ open, onClose, children, title, size = '' }) {
 }
 
 const IVA_OPCIONES = ['10', '5', 'EXENTO']
+const UNIDADES = ['UNIDAD', 'KG', 'GR', 'LT', 'ML', 'CAJA', 'BOLSA', 'SACO', 'FRASCO', 'AMPOLLA', 'DOSIS']
 
 export default function Compras() {
   const [compras, setCompras] = useState([])
@@ -36,6 +37,15 @@ export default function Compras() {
   const [form, setForm] = useState({ proveedor_id: '', filial_id: '1', numero_factura: '', fecha: new Date().toISOString().split('T')[0], observacion: '' })
   const [items, setItems] = useState([{ producto_id: '', cantidad: 1, costo_unit: 0, iva_tipo: '10', subtotal: 0, fecha_vto: '' }])
 
+  // Estados para creación express de producto
+  const [showNewProductModal, setShowNewProductModal] = useState(false)
+  const [activeItemIdx, setActiveItemIdx] = useState(null)
+  const [newProductForm, setNewProductForm] = useState({
+    tipo_inventario: 'FARMACIA', nombre: '', descripcion: '',
+    unidad_medida: 'UNIDAD', precio_costo: 0, precio_venta_menor: 0,
+    precio_venta_mayor: 0, iva_tipo: '10', stock_minimo: 0, requiere_receta: false
+  })
+
   useEffect(() => {
     api.compras().then(setCompras)
     api.personas('?tipo=PROVEEDOR').then(setProveedores)
@@ -44,6 +54,25 @@ export default function Compras() {
   }, [])
 
   const updateItem = (idx, field, value) => {
+    if (field === 'producto_id' && value === 'NEW_PRODUCT') {
+      setActiveItemIdx(idx)
+      const currentItem = items[idx]
+      setNewProductForm({
+        tipo_inventario: 'FARMACIA',
+        nombre: '',
+        descripcion: '',
+        unidad_medida: 'UNIDAD',
+        precio_costo: parseFloat(currentItem?.costo_unit) || 0,
+        precio_venta_menor: (parseFloat(currentItem?.costo_unit) || 0) * 1.30, // sugerencia rápida
+        precio_venta_mayor: (parseFloat(currentItem?.costo_unit) || 0) * 1.25,
+        iva_tipo: currentItem?.iva_tipo || '10',
+        stock_minimo: 0,
+        requiere_receta: false
+      })
+      setShowNewProductModal(true)
+      return
+    }
+
     setItems(prev => prev.map((it, i) => {
       if (i !== idx) return it
       const updated = { ...it, [field]: value }
@@ -53,6 +82,52 @@ export default function Compras() {
       }
       updated.subtotal = (parseFloat(updated.cantidad) || 0) * (parseFloat(updated.costo_unit) || 0)
       return updated
+    }))
+  }
+
+  const handleCreateNewProduct = async () => {
+    if (!newProductForm.nombre) return
+    setLoading(true)
+    try {
+      const formData = new FormData()
+      Object.entries(newProductForm).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) formData.append(k, v)
+      })
+
+      const result = await api.createProducto(formData)
+      const newProdId = result.id
+      const newCode = result.codigo
+
+      // Recargar la lista de productos
+      const updatedProds = await api.productos('?activo=1')
+      setProductos(updatedProds)
+
+      // Seleccionar el nuevo producto en la fila de compras
+      setItems(prev => prev.map((it, i) => {
+        if (i !== activeItemIdx) return it
+        return {
+          ...it,
+          producto_id: String(newProdId),
+          costo_unit: parseFloat(newProductForm.precio_costo) || 0,
+          iva_tipo: newProductForm.iva_tipo,
+          subtotal: (parseFloat(it.cantidad) || 0) * (parseFloat(newProductForm.precio_costo) || 0)
+        }
+      }))
+
+      setShowNewProductModal(false)
+    } catch (e) {
+      alert(`Error al crear el producto: ${e.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCloseNewProductModal = () => {
+    setShowNewProductModal(false)
+    // Deshacer la selección en el item correspondiente
+    setItems(prev => prev.map((it, i) => {
+      if (i !== activeItemIdx) return it
+      return { ...it, producto_id: '' }
     }))
   }
 
@@ -202,6 +277,7 @@ export default function Compras() {
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <select value={it.producto_id} onChange={e => updateItem(idx, 'producto_id', e.target.value)}>
                   <option value="">Seleccionar...</option>
+                  <option value="NEW_PRODUCT" style={{ fontWeight: 'bold', color: 'var(--green-primary)' }}>+ CREAR NUEVO PRODUCTO...</option>
                   {productos.map(p => <option key={p.id} value={p.id}>{p.codigo} — {p.nombre}</option>)}
                 </select>
               </div>
@@ -335,6 +411,82 @@ export default function Compras() {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal Crear Producto Express desde Compra */}
+      <Modal open={showNewProductModal} onClose={handleCloseNewProductModal} title="Crear Nuevo Producto">
+        <div className="modal-body">
+          <div className="form-group">
+            <label>Nombre *</label>
+            <input 
+              value={newProductForm.nombre} 
+              onChange={e => setNewProductForm(f => ({ ...f, nombre: e.target.value.toUpperCase() }))} 
+              placeholder="Ej: BALANCEADO CANINO 15KG" 
+              required
+            />
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Categoría</label>
+              <select value={newProductForm.tipo_inventario} onChange={e => setNewProductForm(f => ({ ...f, tipo_inventario: e.target.value }))}>
+                <option value="FARMACIA">Farmacia (FAR)</option>
+                <option value="CLINICA">Clínica (CLI)</option>
+                <option value="PETSHOP">Petshop (PET)</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Unidad de Medida</label>
+              <select value={newProductForm.unidad_medida} onChange={e => setNewProductForm(f => ({ ...f, unidad_medida: e.target.value }))}>
+                {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>IVA</label>
+              <select value={newProductForm.iva_tipo} onChange={e => setNewProductForm(f => ({ ...f, iva_tipo: e.target.value }))}>
+                <option value="10">10%</option>
+                <option value="5">5%</option>
+                <option value="EXENTO">Exento</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Stock Mínimo</label>
+              <input type="number" value={newProductForm.stock_minimo} onChange={e => setNewProductForm(f => ({ ...f, stock_minimo: parseFloat(e.target.value) || 0 }))} />
+            </div>
+          </div>
+
+          <div className="form-row-3">
+            <div className="form-group">
+              <label>Precio Costo (₲) *</label>
+              <input type="number" value={newProductForm.precio_costo} onChange={e => setNewProductForm(f => ({ ...f, precio_costo: parseFloat(e.target.value) || 0 }))} />
+            </div>
+            <div className="form-group">
+              <label>Precio Minorista (₲) *</label>
+              <input type="number" value={newProductForm.precio_venta_menor} onChange={e => setNewProductForm(f => ({ ...f, precio_venta_menor: parseFloat(e.target.value) || 0 }))} />
+            </div>
+            <div className="form-group">
+              <label>Precio Mayorista (₲) *</label>
+              <input type="number" value={newProductForm.precio_venta_mayor} onChange={e => setNewProductForm(f => ({ ...f, precio_venta_mayor: parseFloat(e.target.value) || 0 }))} />
+            </div>
+          </div>
+          
+          <div className="form-group" style={{ marginTop: 12 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input type="checkbox" checked={newProductForm.requiere_receta} onChange={e => setNewProductForm(f => ({ ...f, requiere_receta: e.target.checked }))} style={{ width: 'auto' }} />
+              Requiere receta médica
+            </label>
+          </div>
+        </div>
+        
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={handleCloseNewProductModal}>Cancelar</button>
+          <button className="btn btn-primary" onClick={handleCreateNewProduct} disabled={!newProductForm.nombre || loading}>
+            {loading ? 'Creando...' : '✓ Crear y Seleccionar'}
+          </button>
+        </div>
       </Modal>
     </div>
   )
