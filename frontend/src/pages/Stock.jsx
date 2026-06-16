@@ -28,8 +28,34 @@ export default function Stock() {
   const [modalBaja, setModalBaja] = useState(null)
   const [modalTransf, setModalTransf] = useState(false)
   const [transf, setTransf] = useState({ producto_id: '', filial_origen: '', filial_destino: '', cantidad: 1, observacion: '' })
-  const [baja, setBaja] = useState({ cantidad: 1, motivo: 'DAÑADO' })
+  const [baja, setBaja] = useState({ cantidad: 1, motivo: 'DAÑADO', lote_id: '' })
+  const [lotesProducto, setLotesProducto] = useState([])
   const [msg, setMsg] = useState(null)
+
+  useEffect(() => {
+    if (modalBaja && modalBaja.producto_id) {
+      api.getProducto(modalBaja.producto_id).then(p => {
+        const lotesFilial = (p.lotes || []).filter(l => l.filial_id === modalBaja.filial_id && l.estado === 'ACTIVO' && Number(l.cantidad_act) > 0);
+        setLotesProducto(lotesFilial);
+        
+        if (modalBaja.lote_id) {
+          setBaja({ 
+            cantidad: modalBaja.cantidad_lote || 1, 
+            motivo: 'VENCIDO', 
+            lote_id: modalBaja.lote_id 
+          });
+        } else {
+          setBaja({ 
+            cantidad: 1, 
+            motivo: 'DAÑADO', 
+            lote_id: lotesFilial.length > 0 ? lotesFilial[0].id : '' 
+          });
+        }
+      }).catch(e => console.error('Error cargando lotes del producto:', e));
+    } else {
+      setLotesProducto([]);
+    }
+  }, [modalBaja])
 
   const load = () => {
     api.stock().then(setStock)
@@ -54,7 +80,13 @@ export default function Stock() {
 
   const doBaja = async () => {
     try {
-      await api.bajaStock({ producto_id: modalBaja.producto_id, filial_id: modalBaja.filial_id, cantidad: parseFloat(baja.cantidad), motivo: baja.motivo })
+      await api.bajaStock({ 
+        producto_id: modalBaja.producto_id, 
+        filial_id: modalBaja.filial_id, 
+        cantidad: parseFloat(baja.cantidad), 
+        motivo: baja.motivo,
+        lote_id: baja.lote_id || null
+      })
       setMsg({ type: 'success', text: '✅ Baja registrada' })
       setModalBaja(null); load()
     } catch (e) { setMsg({ type: 'error', text: `❌ ${e.message}` }) }
@@ -135,7 +167,7 @@ export default function Stock() {
         <div className="table-wrapper">
           <table>
             <thead>
-              <tr><th>Producto</th><th>Lote</th><th>Filial</th><th>Vencimiento</th><th>Días</th><th>Cantidad</th><th>Estado</th></tr>
+              <tr><th>Producto</th><th>Lote</th><th>Filial</th><th>Vencimiento</th><th>Días</th><th>Cantidad</th><th>Estado</th><th></th></tr>
             </thead>
             <tbody>
               {alertas.map((a, i) => (
@@ -143,7 +175,7 @@ export default function Stock() {
                   <td>{a.producto_nombre}</td>
                   <td style={{ color: 'var(--text-muted)' }}>{a.numero_lote || '—'}</td>
                   <td>{a.filial_nombre}</td>
-                  <td>{a.fecha_vto}</td>
+                  <td>{a.fecha_vto ? a.fecha_vto.slice(0, 10) : '—'}</td>
                   <td>
                     <span className={`badge badge-${a.dias_restantes <= 5 ? 'red' : a.dias_restantes <= 15 ? 'gold' : 'blue'}`}>
                       {a.dias_restantes <= 0 ? '⚠️ VENCIDO' : `${a.dias_restantes} días`}
@@ -151,10 +183,15 @@ export default function Stock() {
                   </td>
                   <td>{a.cantidad_act}</td>
                   <td><span className="badge badge-gold">{a.estado}</span></td>
+                  <td>
+                    <button className="btn btn-danger btn-sm" onClick={() => setModalBaja({ producto_id: a.producto_id, filial_id: a.filial_id, nombre: a.producto_nombre, lote_id: a.id, lote_nombre: a.numero_lote, cantidad_lote: Number(a.cantidad_act) })}>
+                      Dar de Baja
+                    </button>
+                  </td>
                 </tr>
               ))}
               {alertas.length === 0 && (
-                <tr><td colSpan={7}><div className="empty-state" style={{ padding: 30 }}><div>✅ Sin alertas de vencimiento</div></div></td></tr>
+                <tr><td colSpan={8}><div className="empty-state" style={{ padding: 30 }}><div>✅ Sin alertas de vencimiento</div></div></td></tr>
               )}
             </tbody>
           </table>
@@ -190,7 +227,27 @@ export default function Stock() {
         {modalBaja && (
           <>
             <div className="modal-body">
-              <div className="alert alert-warning">Producto: <strong>{modalBaja.nombre}</strong></div>
+              <div className="alert alert-warning">
+                Producto: <strong>{modalBaja.nombre}</strong>
+                {modalBaja.lote_nombre && <span> — Lote: <strong>{modalBaja.lote_nombre}</strong></span>}
+              </div>
+              {lotesProducto.length > 0 && (
+                <div className="form-group">
+                  <label>Lote asociado</label>
+                  <select 
+                    value={baja.lote_id} 
+                    onChange={e => setBaja(b => ({ ...b, lote_id: e.target.value }))}
+                    disabled={!!modalBaja.lote_id}
+                  >
+                    <option value="">-- Sin Lote / Stock General --</option>
+                    {lotesProducto.map(l => (
+                      <option key={l.id} value={l.id}>
+                        {l.numero_lote} (Stock: {l.cantidad_act} — Vto: {l.fecha_vto ? l.fecha_vto.slice(0, 10) : 'N/A'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div className="form-group">
                 <label>Motivo</label>
                 <select value={baja.motivo} onChange={e => setBaja(b => ({ ...b, motivo: e.target.value }))}>
