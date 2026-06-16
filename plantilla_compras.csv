@@ -1,2 +1,2 @@
 factura;fecha;proveedor;ruc_proveedor;codigo_producto;nombre_producto;tipo_inventario;cantidad;costo_unitario;precio_venta_menor;precio_venta_mayor;iva_tipo
-;16/06/2026;Ocasional;;;pipicat clasic de 4kg;PETSHOP;6;15000;30000;;10
+;16/06/2026;Ocasional;;;nebulizador;FARMACIA;2;50000;80000;;10
