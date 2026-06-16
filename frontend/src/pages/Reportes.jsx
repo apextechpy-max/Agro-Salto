@@ -38,8 +38,8 @@ export default function Reportes() {
     { id: 'libro-compras', label: '📋 Libro Compras' },
   ]
 
-  const totalVentas = tab === 'ventas' ? data.reduce((s, v) => s + (v.total || 0), 0) : 0
-  const totalDeudores = tab === 'deudores' ? data.reduce((s, d) => s + (d.total_a_cobrar || 0), 0) : 0
+  const totalVentas = tab === 'ventas' ? data.reduce((s, v) => s + Number(v.total || 0), 0) : 0
+  const totalDeudores = tab === 'deudores' ? data.reduce((s, d) => s + Number(d.total_a_cobrar || 0), 0) : 0
 
   return (
     <div>
@@ -216,9 +216,9 @@ export default function Reportes() {
               </table>
               {data.length > 0 && (
                 <div style={{ padding: '12px 16px', borderTop: '2px solid var(--border-light)', display: 'flex', gap: 24, fontWeight: 700 }}>
-                  <span>Total: ₲ {fmt(data.reduce((s, r) => s + r.total, 0))}</span>
-                  <span style={{ color: 'var(--green-primary)' }}>IVA 5%: ₲ {fmt(data.reduce((s, r) => s + r.iva_5, 0))}</span>
-                  <span style={{ color: 'var(--green-primary)' }}>IVA 10%: ₲ {fmt(data.reduce((s, r) => s + r.iva_10, 0))}</span>
+                  <span>Total: ₲ {fmt(data.reduce((s, r) => s + Number(r.total || 0), 0))}</span>
+                  <span style={{ color: 'var(--green-primary)' }}>IVA 5%: ₲ {fmt(data.reduce((s, r) => s + Number(r.iva_5 || 0), 0))}</span>
+                  <span style={{ color: 'var(--green-primary)' }}>IVA 10%: ₲ {fmt(data.reduce((s, r) => s + Number(r.iva_10 || 0), 0))}</span>
                 </div>
               )}
               {data.length === 0 && <div className="empty-state"><p>Sin registros en el período</p></div>}

@@ -89,8 +89,8 @@ export default function Caja() {
     } catch (e) { setMsg({ type: 'error', text: `❌ ${e.message}` }) }
   }
 
-  const totalIngresos = movimientos.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + m.monto, 0)
-  const totalEgresos = movimientos.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + m.monto, 0)
+  const totalIngresos = movimientos.filter(m => m.tipo === 'INGRESO').reduce((s, m) => s + Number(m.monto || 0), 0)
+  const totalEgresos = movimientos.filter(m => m.tipo === 'EGRESO').reduce((s, m) => s + Number(m.monto || 0), 0)
   const saldoActual = totalIngresos - totalEgresos
 
   return (
