@@ -40,6 +40,17 @@ function normalizeDate(dateStr) {
   return dateStr;
 }
 
+// Función para normalizar y estandarizar nombres de productos
+function normalizeProductName(name) {
+  if (!name) return '';
+  let clean = name.trim().toUpperCase();
+  // Eliminar espacios múltiples
+  clean = clean.replace(/\s+/g, ' ');
+  // Eliminar punto final si existe
+  clean = clean.replace(/\.$/, '');
+  return clean.trim();
+}
+
 // Función para parsear una línea de CSV separada por punto y coma (;)
 function parseCSVLine(line) {
   const result = [];
@@ -68,7 +79,7 @@ async function main() {
   }
 
   console.log('📖 Leyendo archivo plantilla_ventas.csv...');
-  const content = fs.readFileSync(csvFile, 'utf-8');
+  const content = fs.readFileSync(csvFile, 'latin1');
   const lines = content.split(/\r?\n/).filter(line => line.trim().length > 0);
 
   if (lines.length <= 1) {
@@ -226,7 +237,7 @@ async function main() {
         // Intentar resolver producto
         let prodId = null;
         let finalCodigo = it.codigo_producto ? it.codigo_producto.trim() : '';
-        const nomProd = it.nombre_producto ? it.nombre_producto.trim().toUpperCase() : '';
+        const nomProd = normalizeProductName(it.nombre_producto);
 
         // 1. Intentar buscar por código si se provee
         if (finalCodigo !== '') {
