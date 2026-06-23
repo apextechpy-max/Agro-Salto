@@ -92,6 +92,7 @@ function parseCSVLine(line) {
 }
 
 async function main() {
+  const productosAutocreados = [];
   const csvFile = path.join(__dirname, 'plantilla_ventas.csv');
   if (!fs.existsSync(csvFile)) {
     console.error(`❌ Error: No se encontró el archivo ${csvFile}`);
@@ -251,28 +252,39 @@ async function main() {
       for (const it of items) {
         const cant = parseFloat(String(it.cantidad || '').replace(/\./g, '').replace(/,/g, '.')) || 1;
         const pUnit = parseFloat(String(it.precio_unitario || '').replace(/\./g, '').replace(/,/g, '.')) || 0;
-        const descItem = parseFloat(String(it.descuento_item || '').replace(/\./g, '').replace(/,/g, '.')) || 0;
+        
+        // Determinar si hay descuento dinámico (palabra "descuento")
+        const descStr = String(it.descuento_item || '').trim().toLowerCase();
+        const isDynamicDiscount = descStr.includes('descuento');
+        let descItem = 0;
+        if (!isDynamicDiscount) {
+          descItem = parseFloat(descStr.replace(/\./g, '').replace(/,/g, '.')) || 0;
+        }
+        
         const ivaTipo = it.iva_tipo || '10';
 
         // Intentar resolver producto
         let prodId = null;
         let finalCodigo = it.codigo_producto ? it.codigo_producto.trim().toUpperCase() : '';
         const nomProd = normalizeProductName(it.nombre_producto);
+        let precioOficial = null;
 
         // 1. Intentar buscar por código si se provee
         if (finalCodigo !== '') {
-          const prodRes = await client.query('SELECT id FROM productos WHERE codigo = $1', [finalCodigo]);
+          const prodRes = await client.query('SELECT id, precio_venta_menor FROM productos WHERE codigo = $1', [finalCodigo]);
           if (prodRes.rows.length > 0) {
             prodId = prodRes.rows[0].id;
+            precioOficial = parseFloat(prodRes.rows[0].precio_venta_menor) || 0;
           }
         }
 
         // 2. Si no se encontró por código (o no se proveyó), buscar por nombre exacto (case-insensitive)
         if (!prodId && nomProd !== '') {
-          const prodRes = await client.query('SELECT id, codigo FROM productos WHERE LOWER(nombre) = LOWER($1) LIMIT 1', [nomProd]);
+          const prodRes = await client.query('SELECT id, codigo, precio_venta_menor FROM productos WHERE LOWER(nombre) = LOWER($1) LIMIT 1', [nomProd]);
           if (prodRes.rows.length > 0) {
             prodId = prodRes.rows[0].id;
             finalCodigo = prodRes.rows[0].codigo;
+            precioOficial = parseFloat(prodRes.rows[0].precio_venta_menor) || 0;
           }
         }
 
@@ -288,12 +300,31 @@ async function main() {
             [finalCodigo, nomProd, pUnit, ivaTipo, tInventario]
           );
           prodId = prodInsert.rows[0].id;
+          precioOficial = pUnit;
+          
+          productosAutocreados.push({
+            codigo: finalCodigo,
+            nombre: nomProd,
+            precio_venta: pUnit,
+            tipo_inventario: tInventario
+          });
+          
           console.log(`✨ Producto autocreado en venta: [${finalCodigo}] ${nomProd} (${tInventario})`);
         }
 
         // 4. Si no tiene ni código ni nombre, usar producto genérico
         if (!prodId) {
           prodId = productoGenericoId;
+          precioOficial = 0;
+        }
+
+        // Si es descuento dinámico, calcularlo ahora que tenemos el precioOficial
+        if (isDynamicDiscount) {
+          if (precioOficial !== null && precioOficial > pUnit) {
+            descItem = (precioOficial - pUnit) * cant;
+          } else {
+            descItem = 0;
+          }
         }
 
         const subItem = (cant * pUnit) - descItem;
@@ -355,6 +386,17 @@ async function main() {
 
     await client.query('COMMIT');
     console.log('\n🎉 ¡Importación de ventas históricas completada con éxito!');
+
+    if (productosAutocreados.length > 0) {
+      console.log('\n📦 PRODUCTOS NUEVOS DETECTADOS Y CREADOS EN LA BASE DE DATOS:');
+      console.log('------------------------------------------------------------');
+      productosAutocreados.forEach(p => {
+        console.log(`- [${p.codigo}] ${p.nombre} (${p.tipo_inventario}) - Precio Venta: ${p.precio_venta.toLocaleString()} GS`);
+      });
+      console.log('------------------------------------------------------------');
+    } else {
+      console.log('\nℹ️ No se detectaron productos nuevos. Todos los productos ya existían en la base de datos.');
+    }
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('\n❌ Error durante la importación de ventas. Se revirtieron los cambios:', error);
