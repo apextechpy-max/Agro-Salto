@@ -238,7 +238,7 @@ async function main() {
 
         // Intentar resolver producto
         let prodId = null;
-        let finalCodigo = it.codigo_producto ? it.codigo_producto.trim() : '';
+        let finalCodigo = it.codigo_producto ? it.codigo_producto.trim().toUpperCase() : '';
         const nomProd = normalizeProductName(it.nombre_producto);
 
         // 1. Intentar buscar por código si se provee

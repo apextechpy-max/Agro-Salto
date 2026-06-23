@@ -3,11 +3,11 @@ import api from '../api'
 
 const fmt = (n) => new Intl.NumberFormat('es-PY').format(Math.round(n || 0))
 
-function Modal({ open, onClose, children, title }) {
+function Modal({ open, onClose, children, title, size = '' }) {
   if (!open) return null
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal" onClick={e => e.stopPropagation()}>
+      <div className={`modal ${size}`} onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <span className="modal-title">{title}</span>
           <button className="modal-close" onClick={onClose}>✕</button>
@@ -67,17 +67,35 @@ export default function Productos() {
   const [fotoFile, setFotoFile] = useState(null)
   const fileInputRef = useRef(null)
 
+  const [modalTab, setModalTab] = useState('datos')
+  const [historialProd, setHistorialProd] = useState({ ventas: [], compras: [], movimientos: [] })
+  const [loadingHistorial, setLoadingHistorial] = useState(false)
+
   const load = () => api.productos(`?buscar=${buscar}`).then(setProductos)
   useEffect(() => {
     load()
     api.filiales().then(setFiliales)
   }, [buscar])
 
+  const loadHistorial = async (id) => {
+    if (!id) return
+    setLoadingHistorial(true)
+    try {
+      const data = await api.productoHistorial(id)
+      setHistorialProd(data)
+    } catch (e) {
+      console.error("Error cargando historial del producto", e)
+    } finally {
+      setLoadingHistorial(false)
+    }
+  }
+
   const openNew = () => {
     setForm(EMPTY)
     setEditId(null)
     setFotoPreview(null)
     setFotoFile(null)
+    setModalTab('datos')
     setShowModal(true)
   }
 
@@ -86,6 +104,7 @@ export default function Productos() {
     setEditId(p.id)
     setFotoPreview(p.foto_url || null)
     setFotoFile(null)
+    setModalTab('datos')
     setShowModal(true)
   }
 
@@ -219,116 +238,207 @@ export default function Productos() {
       </div>
 
       {/* Modal Crear/Editar */}
-      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Editar Producto' : 'Nuevo Producto'}>
+      <Modal open={showModal} onClose={() => setShowModal(false)} title={editId ? 'Detalles del Producto' : 'Nuevo Producto'} size={editId ? 'modal-lg' : ''}>
         <div className="modal-body">
-          {/* Foto del producto */}
-          <div className="form-group">
-            <label>📷 Foto del Producto</label>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {fotoPreview ? (
-                <div style={{ position: 'relative' }}>
-                  <img src={fotoPreview} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--green-primary)' }} />
-                  <button
-                    onClick={removeFoto}
-                    style={{ position: 'absolute', top: -6, right: -6, background: '#e53935', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                  >✕</button>
+          {editId && (
+            <div className="tabs" style={{ marginBottom: 16 }}>
+              <button className={`tab ${modalTab === 'datos' ? 'active' : ''}`} onClick={() => setModalTab('datos')}>Ficha Técnica</button>
+              <button className={`tab ${modalTab === 'historial' ? 'active' : ''}`} onClick={() => { setModalTab('historial'); loadHistorial(editId); }}>📈 Historial (Kardex)</button>
+            </div>
+          )}
+
+          {modalTab === 'datos' ? (
+            <>
+              {/* Foto del producto */}
+              <div className="form-group">
+                <label>📷 Foto del Producto</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  {fotoPreview ? (
+                    <div style={{ position: 'relative' }}>
+                      <img src={fotoPreview} alt="Preview" style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--green-primary)' }} />
+                      <button
+                        onClick={removeFoto}
+                        style={{ position: 'absolute', top: -6, right: -6, background: '#e53935', color: '#fff', border: 'none', borderRadius: '50%', width: 20, height: 20, cursor: 'pointer', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >✕</button>
+                    </div>
+                  ) : (
+                    <div
+                      style={{ width: 80, height: 80, borderRadius: 8, border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, cursor: 'pointer', background: 'var(--bg-card)' }}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      📷
+                    </div>
+                  )}
+                  <div>
+                    <button className="btn btn-secondary btn-sm" onClick={() => fileInputRef.current?.click()}>
+                      {fotoPreview ? 'Cambiar foto' : 'Subir foto'}
+                    </button>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>JPG, PNG o WEBP. Máx. 2MB</div>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleFotoChange}
+                  />
                 </div>
-              ) : (
-                <div
-                  style={{ width: 80, height: 80, borderRadius: 8, border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, cursor: 'pointer', background: 'var(--bg-card)' }}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  📷
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Código *</label>
+                  <input value={editId ? form.codigo : '— Autogenerado —'} disabled style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', fontWeight: 700 }} />
+                </div>
+                <div className="form-group">
+                  <label>Categoría</label>
+                  <select value={form.tipo_inventario} onChange={e => setForm(f => ({ ...f, tipo_inventario: e.target.value }))} disabled={!!editId}>
+                    <option value="FARMACIA">Farmacia (FAR)</option>
+                    <option value="CLINICA">Clínica (CLI)</option>
+                    <option value="PETSHOP">Petshop (PET)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Nombre *</label>
+                <input value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Unidad de Medida</label>
+                  <select value={form.unidad_medida} onChange={e => setForm(f => ({ ...f, ...f, unidad_medida: e.target.value }))}>
+                    {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>IVA</label>
+                  <select value={form.iva_tipo} onChange={e => setForm(f => ({ ...f, iva_tipo: e.target.value }))}>
+                    <option value="10">10%</option>
+                    <option value="5">5%</option>
+                    <option value="EXENTO">Exento</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-row-3">
+                <div className="form-group">
+                  <label>Precio Costo (₲)</label>
+                  <input type="number" value={form.precio_costo} onChange={e => setForm(f => ({ ...f, precio_costo: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label>Precio Minorista (₲)</label>
+                  <input type="number" value={form.precio_venta_menor} onChange={e => setForm(f => ({ ...f, precio_venta_menor: e.target.value }))} />
+                </div>
+                <div className="form-group">
+                  <label>Precio Mayorista (₲)</label>
+                  <input type="number" value={form.precio_venta_mayor} onChange={e => setForm(f => ({ ...f, precio_venta_mayor: e.target.value }))} />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stock Mínimo</label>
+                  <input type="number" value={form.stock_minimo} onChange={e => setForm(f => ({ ...f, stock_minimo: e.target.value }))} />
+                </div>
+                <div className="form-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={form.requiere_receta} onChange={e => setForm(f => ({ ...f, requiere_receta: e.target.checked }))} style={{ width: 'auto' }} />
+                    Requiere receta
+                  </label>
+                </div>
+              </div>
+              {editId && (
+                <div className="form-group">
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                    <input type="checkbox" checked={form.activo} onChange={e => setForm(f => ({ ...f, activo: e.target.checked }))} style={{ width: 'auto' }} />
+                    Producto activo
+                  </label>
                 </div>
               )}
-              <div>
-                <button className="btn btn-secondary btn-sm" onClick={() => fileInputRef.current?.click()}>
-                  {fotoPreview ? 'Cambiar foto' : 'Subir foto'}
-                </button>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>JPG, PNG o WEBP. Máx. 2MB</div>
-              </div>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleFotoChange}
-              />
-            </div>
-          </div>
+            </>
+          ) : (
+            <div style={{ maxHeight: '60vh', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+              {loadingHistorial ? (
+                <div style={{ textAlign: 'center', padding: 40 }}><div className="spinner" /> Cargando historial...</div>
+              ) : (
+                <>
+                  <div>
+                    <h4 style={{ margin: '0 0 8px 0', borderBottom: '1px solid var(--border)', paddingBottom: 6 }}>🛒 Ventas Recientes</h4>
+                    <div className="table-wrapper" style={{ maxHeight: 200, overflowY: 'auto' }}>
+                      <table>
+                        <thead>
+                          <tr><th>Fecha</th><th>Venta #</th><th>Cliente</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+                          {historialProd.ventas.map((v, idx) => (
+                            <tr key={idx}>
+                              <td>{new Date(v.fecha).toLocaleDateString('es-PY')}</td>
+                              <td>#{v.venta_id}</td>
+                              <td>{v.cliente_nombre || 'Consumidor Final'}</td>
+                              <td>{v.cantidad}</td>
+                              <td>₲ {fmt(v.precio_unit)}</td>
+                              <td style={{ fontWeight: 700 }}>₲ {fmt(v.subtotal)}</td>
+                            </tr>
+                          ))}
+                          {historialProd.ventas.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', opacity: 0.5 }}>Sin ventas registradas</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>Código *</label>
-              <input value={editId ? form.codigo : '— Autogenerado —'} disabled style={{ background: 'var(--bg-card)', color: 'var(--text-muted)', fontWeight: 700 }} />
-            </div>
-            <div className="form-group">
-              <label>Categoría</label>
-              <select value={form.tipo_inventario} onChange={e => setForm(f => ({ ...f, tipo_inventario: e.target.value }))} disabled={!!editId}>
-                <option value="FARMACIA">Farmacia (FAR)</option>
-                <option value="CLINICA">Clínica (CLI)</option>
-                <option value="PETSHOP">Petshop (PET)</option>
-              </select>
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Nombre *</label>
-            <input value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))} />
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Unidad de Medida</label>
-              <select value={form.unidad_medida} onChange={e => setForm(f => ({ ...f, unidad_medida: e.target.value }))}>
-                {UNIDADES.map(u => <option key={u} value={u}>{u}</option>)}
-              </select>
-            </div>
-            <div className="form-group">
-              <label>IVA</label>
-              <select value={form.iva_tipo} onChange={e => setForm(f => ({ ...f, iva_tipo: e.target.value }))}>
-                <option value="10">10%</option>
-                <option value="5">5%</option>
-                <option value="EXENTO">Exento</option>
-              </select>
-            </div>
-          </div>
-          <div className="form-row-3">
-            <div className="form-group">
-              <label>Precio Costo (₲)</label>
-              <input type="number" value={form.precio_costo} onChange={e => setForm(f => ({ ...f, precio_costo: e.target.value }))} />
-            </div>
-            <div className="form-group">
-              <label>Precio Minorista (₲)</label>
-              <input type="number" value={form.precio_venta_menor} onChange={e => setForm(f => ({ ...f, precio_venta_menor: e.target.value }))} />
-            </div>
-            <div className="form-group">
-              <label>Precio Mayorista (₲)</label>
-              <input type="number" value={form.precio_venta_mayor} onChange={e => setForm(f => ({ ...f, precio_venta_mayor: e.target.value }))} />
-            </div>
-          </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label>Stock Mínimo</label>
-              <input type="number" value={form.stock_minimo} onChange={e => setForm(f => ({ ...f, stock_minimo: e.target.value }))} />
-            </div>
-            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={form.requiere_receta} onChange={e => setForm(f => ({ ...f, requiere_receta: e.target.checked }))} style={{ width: 'auto' }} />
-                Requiere receta
-              </label>
-            </div>
-          </div>
-          {editId && (
-            <div className="form-group">
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
-                <input type="checkbox" checked={form.activo} onChange={e => setForm(f => ({ ...f, activo: e.target.checked }))} style={{ width: 'auto' }} />
-                Producto activo
-              </label>
+                  <div>
+                    <h4 style={{ margin: '0 0 8px 0', borderBottom: '1px solid var(--border)', paddingBottom: 6 }}>🏭 Compras Recientes</h4>
+                    <div className="table-wrapper" style={{ maxHeight: 200, overflowY: 'auto' }}>
+                      <table>
+                        <thead>
+                          <tr><th>Fecha</th><th>Factura</th><th>Proveedor</th><th>Cantidad</th><th>Costo</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>
+                          {historialProd.compras.map((c, idx) => (
+                            <tr key={idx}>
+                              <td>{new Date(c.fecha).toLocaleDateString('es-PY')}</td>
+                              <td>{c.numero_factura || `Compra #${c.compra_id}`}</td>
+                              <td>{c.proveedor_nombre || 'Proveedor Genérico'}</td>
+                              <td>{c.cantidad}</td>
+                              <td>₲ {fmt(c.costo_unit)}</td>
+                              <td style={{ fontWeight: 700 }}>₲ {fmt(c.subtotal)}</td>
+                            </tr>
+                          ))}
+                          {historialProd.compras.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', opacity: 0.5 }}>Sin compras registradas</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 style={{ margin: '0 0 8px 0', borderBottom: '1px solid var(--border)', paddingBottom: 6 }}>📦 Movimientos de Stock</h4>
+                    <div className="table-wrapper" style={{ maxHeight: 200, overflowY: 'auto' }}>
+                      <table>
+                        <thead>
+                          <tr><th>Fecha</th><th>Tipo</th><th>Origen</th><th>Destino</th><th>Cant.</th><th>Observación</th></tr>
+                        </thead>
+                        <tbody>
+                          {historialProd.movimientos.map((m, idx) => (
+                            <tr key={idx}>
+                              <td style={{ fontSize: 11 }}>{new Date(m.fecha).toLocaleString('es-PY', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                              <td><span className={`badge badge-${m.tipo === 'VENTA' ? 'green' : m.tipo === 'COMPRA' ? 'blue' : 'gray'}`}>{m.tipo}</span></td>
+                              <td>{m.filial_origen_nombre || '—'}</td>
+                              <td>{m.filial_destino_nombre || '—'}</td>
+                              <td style={{ fontWeight: 700, color: m.cantidad < 0 ? 'var(--red)' : 'var(--green-primary)' }}>{m.cantidad}</td>
+                              <td style={{ fontSize: 11 }}>{m.observacion || '—'}</td>
+                            </tr>
+                          ))}
+                          {historialProd.movimientos.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', opacity: 0.5 }}>Sin movimientos de stock</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
         <div className="modal-footer">
           <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancelar</button>
-          <button className="btn btn-primary" onClick={save}>✓ Guardar</button>
+          {modalTab === 'datos' && <button className="btn btn-primary" onClick={save}>✓ Guardar</button>}
         </div>
       </Modal>
 

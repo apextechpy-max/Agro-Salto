@@ -11,6 +11,9 @@ export default function Reportes() {
   const [hasta, setHasta] = useState(today())
   const [data, setData] = useState([])
   const [loading, setLoading] = useState(false)
+  const [segmento, setSegmento] = useState('TODOS')
+  const [excludedProducts, setExcludedProducts] = useState(new Set())
+  const [comisionPct, setComisionPct] = useState(70)
 
   const load = async () => {
     setLoading(true)
@@ -18,6 +21,11 @@ export default function Reportes() {
       const q = `?desde=${desde}&hasta=${hasta}`
       let result = []
       if (tab === 'ventas') result = await api.repVentas(q)
+      if (tab === 'ventas-detalle') {
+        const queryDetalle = `?desde=${desde}&hasta=${hasta}&tipo_inventario=${segmento}`
+        result = await api.repVentasDetalle(queryDetalle)
+        setExcludedProducts(new Set())
+      }
       if (tab === 'cierres') result = await api.repCierres(q)
       if (tab === 'deudores') result = await api.repDeudores()
       if (tab === 'stock') result = await api.repStockCritico()
@@ -27,10 +35,11 @@ export default function Reportes() {
     } finally { setLoading(false) }
   }
 
-  useEffect(() => { load() }, [tab, desde, hasta])
+  useEffect(() => { load() }, [tab, desde, hasta, segmento])
 
   const TABS = [
-    { id: 'ventas', label: '📊 Ventas' },
+    { id: 'ventas', label: '📊 Ventas Resumen' },
+    { id: 'ventas-detalle', label: '🔍 Ventas por Ítem' },
     { id: 'cierres', label: '💰 Cierres de Caja' },
     { id: 'deudores', label: '👥 Deudores' },
     { id: 'stock', label: '📦 Stock Crítico' },
@@ -54,7 +63,7 @@ export default function Reportes() {
         {TABS.map(t => <button key={t.id} className={`tab ${tab === t.id ? 'active' : ''}`} onClick={() => setTab(t.id)}>{t.label}</button>)}
       </div>
 
-      {['ventas', 'cierres', 'libro-ventas', 'libro-compras'].includes(tab) && (
+      {['ventas', 'ventas-detalle', 'cierres', 'libro-ventas', 'libro-compras'].includes(tab) && (
         <div className="search-bar">
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label>Desde</label>
@@ -64,6 +73,17 @@ export default function Reportes() {
             <label>Hasta</label>
             <input type="date" value={hasta} onChange={e => setHasta(e.target.value)} style={{ width: 160 }} />
           </div>
+          {tab === 'ventas-detalle' && (
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Segmento</label>
+              <select value={segmento} onChange={e => setSegmento(e.target.value)} style={{ padding: '8px 12px', minWidth: 140 }}>
+                <option value="TODOS">Todos</option>
+                <option value="PETSHOP">Petshop</option>
+                <option value="FARMACIA">Farmacia</option>
+                <option value="CLINICA">Clínica</option>
+              </select>
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'flex-end' }}>
             <button className="btn btn-primary" onClick={load}>🔍 Buscar</button>
           </div>
@@ -114,6 +134,179 @@ export default function Reportes() {
               {data.length === 0 && <div className="empty-state"><p>Sin ventas en el período</p></div>}
             </div>
           )}
+
+          {tab === 'ventas-detalle' && (() => {
+            const categoriesInData = Array.from(new Set(data.map(item => item.categoria_nombre || 'General')))
+            const productsInData = data.reduce((acc, item) => {
+              const existing = acc.find(p => p.codigo === item.producto_codigo)
+              if (!existing) {
+                acc.push({
+                  codigo: item.producto_codigo,
+                  nombre: item.producto_nombre,
+                  categoria: item.categoria_nombre || 'General'
+                })
+              }
+              return acc
+            }, [])
+
+            const filteredData = data.filter(item => !excludedProducts.has(item.producto_codigo))
+            const totalFiltrado = filteredData.reduce((sum, item) => sum + Number(item.subtotal || 0), 0)
+
+            const toggleProduct = (code) => {
+              setExcludedProducts(prev => {
+                const next = new Set(prev)
+                if (next.has(code)) next.delete(code)
+                else next.add(code)
+                return next
+              })
+            }
+
+            const toggleCategory = (catName) => {
+              const prodsInCat = productsInData.filter(p => p.categoria === catName)
+              const allExcluded = prodsInCat.every(p => excludedProducts.has(p.codigo))
+
+              setExcludedProducts(prev => {
+                const next = new Set(prev)
+                prodsInCat.forEach(p => {
+                  if (allExcluded) {
+                    next.delete(p.codigo)
+                  } else {
+                    next.add(p.codigo)
+                  }
+                })
+                return next
+              })
+            }
+
+            const checkAll = () => setExcludedProducts(new Set())
+            const uncheckAll = () => setExcludedProducts(new Set(productsInData.map(p => p.codigo)))
+
+            return (
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 20, alignItems: 'start', marginTop: 16 }}>
+                {/* Tabla principal */}
+                <div>
+                  <div className="table-wrapper" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Fecha</th>
+                          <th>Venta #</th>
+                          <th>Código</th>
+                          <th>Producto</th>
+                          <th>Categoría</th>
+                          <th>Cant.</th>
+                          <th>Precio Unit.</th>
+                          <th>Subtotal</th>
+                          <th>Cliente</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredData.map((item, i) => (
+                          <tr key={i}>
+                            <td style={{ fontSize: 11 }}>{new Date(item.fecha).toLocaleDateString('es-PY')}</td>
+                            <td>#{item.venta_id}</td>
+                            <td style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.producto_codigo}</td>
+                            <td style={{ fontWeight: 500 }}>{item.producto_nombre}</td>
+                            <td><span className="badge badge-gray">{item.categoria_nombre || 'General'}</span></td>
+                            <td>{item.cantidad}</td>
+                            <td>₲ {fmt(item.precio_unit)}</td>
+                            <td style={{ fontWeight: 700 }}>₲ {fmt(item.subtotal)}</td>
+                            <td>{item.cliente_nombre || 'Consumidor Final'}</td>
+                          </tr>
+                        ))}
+                        {filteredData.length === 0 && (
+                          <tr><td colSpan={9} style={{ textAlign: 'center', opacity: 0.5, padding: 30 }}>Sin registros (o todos los ítems fueron excluidos)</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {filteredData.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, justifyContent: 'space-between', alignItems: 'center', padding: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, marginTop: 16 }}>
+                      <div>
+                        <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>Total Ventas Seleccionadas</div>
+                        <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--green-primary)' }}>₲ {fmt(totalFiltrado)}</div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12, borderLeft: '1px solid var(--border)', paddingLeft: 24 }}>
+                        <div>
+                          <label style={{ fontSize: 12, color: 'var(--text-muted)', display: 'block', marginBottom: 4 }}>% Pago Tercero</label>
+                          <input 
+                            type="number" 
+                            value={comisionPct} 
+                            onChange={e => setComisionPct(Math.max(0, Math.min(100, parseFloat(e.target.value) || 0)))}
+                            style={{ width: 80, padding: '6px 10px', borderRadius: 6, border: '1px solid var(--border)', fontWeight: 700 }}
+                          />
+                        </div>
+                        <div>
+                          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pago Correspondiente</div>
+                          <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--gold)' }}>₲ {fmt(totalFiltrado * comisionPct / 100)}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Panel de Selección Lateral */}
+                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: 16, maxHeight: '70vh', overflowY: 'auto' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, borderBottom: '1px solid var(--border)', paddingBottom: 8 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14 }}>Filtro de Selección</span>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button className="btn btn-secondary btn-sm" onClick={checkAll} style={{ padding: '2px 6px', fontSize: 11 }}>Todos</button>
+                      <button className="btn btn-secondary btn-sm" onClick={uncheckAll} style={{ padding: '2px 6px', fontSize: 11 }}>Ninguno</button>
+                    </div>
+                  </div>
+
+                  {data.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: 20, opacity: 0.5, fontSize: 13 }}>No hay datos en el rango seleccionado</div>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                      {categoriesInData.map(cat => {
+                        const prodsInCat = productsInData.filter(p => p.categoria === cat)
+                        const allExcluded = prodsInCat.every(p => excludedProducts.has(p.codigo))
+                        const someExcluded = prodsInCat.some(p => excludedProducts.has(p.codigo))
+                        const isChecked = !allExcluded
+
+                        return (
+                          <div key={cat} style={{ borderBottom: '1px dashed var(--border)', paddingBottom: 10 }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 700, fontSize: 13, cursor: 'pointer', marginBottom: 6 }}>
+                              <input 
+                                type="checkbox" 
+                                checked={isChecked} 
+                                ref={el => {
+                                  if (el) el.indeterminate = isChecked && someExcluded
+                                }}
+                                onChange={() => toggleCategory(cat)} 
+                                style={{ width: 'auto' }}
+                              />
+                              📂 {cat}
+                            </label>
+                            
+                            <div style={{ paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                              {prodsInCat.map(p => {
+                                const isProdChecked = !excludedProducts.has(p.codigo)
+                                return (
+                                  <label key={p.codigo} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, cursor: 'pointer', color: isProdChecked ? 'var(--text)' : 'var(--text-muted)' }}>
+                                    <input 
+                                      type="checkbox" 
+                                      checked={isProdChecked} 
+                                      onChange={() => toggleProduct(p.codigo)} 
+                                      style={{ width: 'auto' }}
+                                    />
+                                    {p.nombre}
+                                  </label>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
 
           {tab === 'cierres' && (
             <div className="table-wrapper">

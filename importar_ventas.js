@@ -26,7 +26,7 @@ const pool = new Pool({
 // Función para normalizar fechas de DD/MM/AAAA a AAAA-MM-DD
 function normalizeDate(dateStr) {
   if (!dateStr) return null;
-  dateStr = dateStr.trim();
+  dateStr = dateStr.trim().toLowerCase();
   if (dateStr.includes('/')) {
     const parts = dateStr.split('/');
     if (parts.length === 3) {
@@ -35,6 +35,26 @@ function normalizeDate(dateStr) {
       const year = parts[2];
       const fullYear = year.length === 2 ? `20${year}` : year;
       return `${fullYear}-${month}-${day}`;
+    } else if (parts.length === 2) {
+      const day = parts[0].padStart(2, '0');
+      const monthStr = parts[1];
+      const meses = {
+        'jan': '01', 'ene': '01',
+        'fev': '02', 'feb': '02',
+        'mar': '03',
+        'abr': '04',
+        'mai': '05', 'may': '05',
+        'jun': '06',
+        'jul': '07',
+        'ago': '08',
+        'set': '09', 'sep': '09',
+        'out': '10', 'oct': '10',
+        'nov': '11',
+        'dez': '12', 'dic': '12'
+      };
+      const month = meses[monthStr] || '01';
+      const year = new Date().getFullYear();
+      return `${year}-${month}-${day}`;
     }
   }
   return dateStr;
@@ -229,14 +249,14 @@ async function main() {
       const processedItems = [];
 
       for (const it of items) {
-        const cant = parseFloat(it.cantidad) || 1;
-        const pUnit = parseFloat(it.precio_unitario) || 0;
-        const descItem = parseFloat(it.descuento_item) || 0;
+        const cant = parseFloat(String(it.cantidad || '').replace(/\./g, '').replace(/,/g, '.')) || 1;
+        const pUnit = parseFloat(String(it.precio_unitario || '').replace(/\./g, '').replace(/,/g, '.')) || 0;
+        const descItem = parseFloat(String(it.descuento_item || '').replace(/\./g, '').replace(/,/g, '.')) || 0;
         const ivaTipo = it.iva_tipo || '10';
 
         // Intentar resolver producto
         let prodId = null;
-        let finalCodigo = it.codigo_producto ? it.codigo_producto.trim() : '';
+        let finalCodigo = it.codigo_producto ? it.codigo_producto.trim().toUpperCase() : '';
         const nomProd = normalizeProductName(it.nombre_producto);
 
         // 1. Intentar buscar por código si se provee

@@ -124,6 +124,56 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Obtener historial del producto (ventas, compras, movimientos de stock)
+router.get('/:id/historial', async (req, res) => {
+  const { id } = req.params;
+  try {
+    // 1. Obtener ventas del producto
+    const ventasRes = await db.query(`
+      SELECT vd.cantidad, vd.precio_unit, vd.subtotal, v.fecha, v.id as venta_id, p.razon_social as cliente_nombre
+      FROM ventas_detalle vd
+      JOIN ventas v ON v.id = vd.venta_id
+      LEFT JOIN personas p ON p.id = v.cliente_id
+      WHERE vd.producto_id = $1 AND v.estado = 'COMPLETADA'
+      ORDER BY v.fecha DESC
+      LIMIT 100
+    `, [id]);
+
+    // 2. Obtener compras del producto
+    const comprasRes = await db.query(`
+      SELECT cd.cantidad, cd.costo_unit, cd.subtotal, c.fecha, c.id as compra_id, p.razon_social as proveedor_nombre, c.numero_factura
+      FROM compras_detalle cd
+      JOIN compras c ON c.id = cd.compra_id
+      LEFT JOIN personas p ON p.id = c.proveedor_id
+      WHERE cd.producto_id = $1 AND c.estado != 'ANULADA'
+      ORDER BY c.fecha DESC
+      LIMIT 100
+    `, [id]);
+
+    // 3. Obtener movimientos de stock
+    const movRes = await db.query(`
+      SELECT ms.*, u.nombre_completo as usuario_nombre,
+             fo.nombre as filial_origen_nombre, fd.nombre as filial_destino_nombre
+      FROM movimientos_stock ms
+      JOIN usuarios u ON u.id = ms.usuario_id
+      LEFT JOIN filiales fo ON fo.id = ms.filial_origen
+      LEFT JOIN filiales fd ON fd.id = ms.filial_destino
+      WHERE ms.producto_id = $1
+      ORDER BY ms.fecha DESC
+      LIMIT 100
+    `, [id]);
+
+    res.json({
+      ventas: ventasRes.rows,
+      compras: comprasRes.rows,
+      movimientos: movRes.rows
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 router.post('/', upload.single('foto'), async (req, res) => {
   const { nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, tipo_inventario } = req.body;
   if (!nombre) return res.status(400).json({ error: 'Nombre es requerido' });

@@ -1,5 +1,36 @@
 ticket;fecha;cliente;ruc_cliente;tipo_pago;codigo_producto;nombre_producto;tipo_inventario;cantidad;precio_unitario;iva_tipo;descuento_item
-V-0001;2026-05-10 09:30:00;;;CONTADO;1001;Balanceado Perro Adulto 15kg;PETSHOP;2;160000;10;0
-V-0001;2026-05-10 09:30:00;;;CONTADO;1002;Antiparasitario Canino;FARMACIA;1;75000;10;0
-V-0002;2026-05-11 11:15:00;MarÃ­a Cardozo;4433221-5;CREDITO;1003;Shampoo HipoalergÃ©nico 250ml;PETSHOP;1;40000;10;0
-V-0003;2026-05-12 16:45:00;;;CONTADO;;Servicios de Limpieza;AMBOS;1;150000;10;0
+V-0001;30/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;70.000;10;0
+V-0002;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;80.000;10;0
+V-0003;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0004;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0005;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0006;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0007;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0008;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0009;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0010;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;60.000;10;0
+V-0011;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;60.000;10;0
+V-0012;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0013;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;50.000;10;0
+V-0014;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0015;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
+V-0016;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
+V-0017;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
+V-0018;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0019;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0020;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
+V-0021;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0022;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0023;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0024;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0025;06/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;60.000;10;0
+V-0026;06/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0027;08/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0028;09/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
+V-0029;09/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0030;10/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
+V-0031;13/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;80.000;10;0
+V-0032;15/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
+V-0033;16/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0034;17/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
+V-0035;17/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;40.000;10;0

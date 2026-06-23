@@ -110,4 +110,51 @@ router.get('/libro-compras', async (req, res) => {
   }
 });
 
+router.get('/ventas-detalle', async (req, res) => {
+  const { desde, hasta, filial_id, tipo_inventario, categoria_id } = req.query;
+  try {
+    let q = `
+      SELECT vd.id, v.fecha, p.nombre as producto_nombre, p.codigo as producto_codigo, 
+             p.tipo_inventario, c.nombre as categoria_nombre, p.categoria_id,
+             vd.cantidad, vd.precio_unit, vd.subtotal, v.id as venta_id,
+             cli.razon_social as cliente_nombre, f.nombre as filial_nombre
+      FROM ventas_detalle vd
+      JOIN ventas v ON v.id = vd.venta_id
+      JOIN productos p ON p.id = vd.producto_id
+      JOIN filiales f ON f.id = v.filial_id
+      LEFT JOIN categorias c ON c.id = p.categoria_id
+      LEFT JOIN personas cli ON cli.id = v.cliente_id
+      WHERE v.estado = 'COMPLETADA'
+    `;
+    const params = [];
+    if (desde) {
+      q += ` AND v.fecha::date >= $${params.length + 1}`;
+      params.push(desde);
+    }
+    if (hasta) {
+      q += ` AND v.fecha::date <= $${params.length + 1}`;
+      params.push(hasta);
+    }
+    if (filial_id) {
+      q += ` AND v.filial_id = $${params.length + 1}`;
+      params.push(parseInt(filial_id));
+    }
+    if (tipo_inventario && tipo_inventario !== 'TODOS') {
+      q += ` AND p.tipo_inventario = $${params.length + 1}`;
+      params.push(tipo_inventario);
+    }
+    if (categoria_id) {
+      q += ` AND (p.categoria_id = $${params.length + 1} OR c.padre_id = $${params.length + 1})`;
+      params.push(parseInt(categoria_id));
+    }
+
+    q += ' ORDER BY v.fecha DESC';
+    const result = await db.query(q, params);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
+

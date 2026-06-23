@@ -48,6 +48,7 @@ export const api = {
   // Productos
   productos: (q = '') => req('GET', `/productos${q}`),
   getProducto: (id) => req('GET', `/productos/${id}`),
+  productoHistorial: (id) => req('GET', `/productos/${id}/historial`),
   createProducto: (d) => req('POST', '/productos', d),
   updateProducto: (id, d) => req('PUT', `/productos/${id}`, d),
   ajusteStock: (id, d) => req('POST', `/productos/${id}/ajuste`, d),
@@ -97,6 +98,7 @@ export const api = {
 
   // Reportes
   repVentas: (q = '') => req('GET', `/reportes/ventas${q}`),
+  repVentasDetalle: (q = '') => req('GET', `/reportes/ventas-detalle${q}`),
   repStockCritico: () => req('GET', '/reportes/stock-critico'),
   repDeudores: () => req('GET', '/reportes/deudores'),
   repCierres: (q = '') => req('GET', `/reportes/cierres-caja${q}`),
