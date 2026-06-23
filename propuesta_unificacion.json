@@ -3,9 +3,47 @@
     "unificar": true,
     "score": 1,
     "nuevo_producto": {
-      "id": 138,
-      "codigo": "PRD-0002",
-      "nombre": "AFOXOCAN DE 10 A 25 KG",
+      "id": 139,
+      "codigo": "PRD-0003",
+      "nombre": "COMP CANEX",
+      "precio": 15000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "producto_existente": {
+      "id": 106,
+      "codigo": "PET-0039",
+      "nombre": "CANEX ORIGINAL",
+      "precio": 15000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 148,
+      "codigo": "PRD-0012",
+      "nombre": "AFOXOPET 2-4 KG",
+      "precio": 20000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 53,
+      "codigo": "FAR-0021",
+      "nombre": "AFOXOCAN 2 A 4 KG",
+      "precio": 20000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 149,
+      "codigo": "PRD-0013",
+      "nombre": "AFOXOPET 10-25 KG",
       "precio": 35000,
       "tipo_inventario": "AMBOS"
     },
@@ -22,68 +60,87 @@
     "unificar": true,
     "score": 1,
     "nuevo_producto": {
-      "id": 154,
-      "codigo": "PRD-0018",
-      "nombre": "FLOXACIN DE 50MG",
-      "precio": 15000,
+      "id": 150,
+      "codigo": "PRD-0014",
+      "nombre": "XIXI NÃO - XIXI SIM",
+      "precio": 32000,
       "tipo_inventario": "AMBOS"
     },
     "producto_existente": {
-      "id": 66,
-      "codigo": "FAR-0034",
-      "nombre": "FLOXACIN 50MG",
-      "precio": 15000,
+      "id": 105,
+      "codigo": "PET-0038",
+      "nombre": "KIT EDUCADOR",
+      "precio": 32000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": false,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 160,
+      "codigo": "PRD-0024",
+      "nombre": "CONEJO 2 KG",
+      "precio": 10000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 28,
+      "codigo": "PET-0026",
+      "nombre": "CONEJOS 25 KG",
+      "precio": 85000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 162,
+      "codigo": "PRD-0026",
+      "nombre": "AFOXOCAN 10-25",
+      "precio": 35000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 54,
+      "codigo": "FAR-0022",
+      "nombre": "AFOXOCAN 10 A 25 KG",
+      "precio": 35000,
       "tipo_inventario": "FARMACIA"
     },
     "razon": "Similitud de nombre del 100%."
   },
   {
     "unificar": true,
-    "score": 0.96,
+    "score": 1,
     "nuevo_producto": {
-      "id": 218,
-      "codigo": "PRD-0082",
-      "nombre": "PRONTO DOG CACHORRO 1.5 KG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 3,
-      "codigo": "PET-0001",
-      "nombre": "PRONTODOG CACHORRO 1.5 KG",
-      "precio": 25000,
+      "id": 173,
+      "codigo": "PRD-0037",
+      "nombre": "CERDO TERMINADOR",
+      "precio": 75000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 96%."
-  },
-  {
-    "unificar": true,
-    "score": 0.955,
-    "nuevo_producto": {
-      "id": 167,
-      "codigo": "PRD-0031",
-      "nombre": "AMOXIVET BIOTIC 500MG",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
     "producto_existente": {
-      "id": 51,
-      "codigo": "FAR-0019",
-      "nombre": "AMOXIVET BIOTIC 500 MG",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
+      "id": 27,
+      "codigo": "PET-0025",
+      "nombre": "CERDOS TERMINADOR 25 KG",
+      "precio": 80000,
+      "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 95%."
+    "razon": "Similitud de nombre del 100%."
   },
   {
     "unificar": false,
-    "score": 0.955,
+    "score": 1,
     "nuevo_producto": {
-      "id": 223,
-      "codigo": "PRD-0087",
-      "nombre": "AVES CRECIMIENTO 2 KG",
-      "precio": 10000,
-      "tipo_inventario": "AMBOS"
+      "id": 176,
+      "codigo": "PRD-0040",
+      "nombre": "AVES CRECIMIENTO 3 KG",
+      "precio": 15000,
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 22,
@@ -92,17 +149,55 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 95%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
+    "razon": "Similitud de nombre del 100%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 190,
+      "codigo": "PRD-0054",
+      "nombre": "GAVIPLEN GOTAS",
+      "precio": 25000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 49,
+      "codigo": "FAR-0017",
+      "nombre": "GASIPLEN ORAL 20 ML",
+      "precio": 25000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 100%."
   },
   {
     "unificar": false,
-    "score": 0.952,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 223,
+      "codigo": "PRD-0087",
+      "nombre": "AVES CRECIMIENTO 2 KG",
+      "precio": 10000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 22,
+      "codigo": "PET-0020",
+      "nombre": "AVES CRECIMIENTO 25 KG",
+      "precio": 85000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
+  },
+  {
+    "unificar": false,
+    "score": 1,
     "nuevo_producto": {
       "id": 227,
       "codigo": "PRD-0091",
       "nombre": "AVES TERMINADOR 5 KG",
       "precio": 25000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 23,
@@ -111,150 +206,131 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 95%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (25.000 GS vs 85.000 GS)."
+    "razon": "Similitud de nombre del 100%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (25.000 GS vs 85.000 GS)."
   },
   {
     "unificar": true,
-    "score": 0.944,
+    "score": 1,
     "nuevo_producto": {
-      "id": 210,
-      "codigo": "PRD-0074",
-      "nombre": "VACUNA ANTIRRÁBICA",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 125,
-      "codigo": "FAR-0069",
-      "nombre": "VACUNA ANTIRABICA",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 94%."
-  },
-  {
-    "unificar": true,
-    "score": 0.933,
-    "nuevo_producto": {
-      "id": 222,
-      "codigo": "PRD-0086",
-      "nombre": "POMADA IODURADA",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 52,
-      "codigo": "FAR-0020",
-      "nombre": "POMADA YODURADA",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 93%."
-  },
-  {
-    "unificar": true,
-    "score": 0.933,
-    "nuevo_producto": {
-      "id": 237,
-      "codigo": "PRD-0101",
-      "nombre": "ARENA BIONATURE",
-      "precio": 45000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 108,
-      "codigo": "PET-0041",
-      "nombre": "ARENA BIONATURA",
-      "precio": 45000,
+      "id": 235,
+      "codigo": "PRD-0099",
+      "nombre": "CEPILLO CON PASTA DENTAL",
+      "precio": 25000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 93%."
+    "producto_existente": {
+      "id": 109,
+      "codigo": "PET-0042",
+      "nombre": "KIT CEPILLO",
+      "precio": 25000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
   },
   {
     "unificar": true,
-    "score": 0.929,
+    "score": 1,
     "nuevo_producto": {
-      "id": 189,
-      "codigo": "PRD-0053",
-      "nombre": "FLOXACIN 50 MG",
+      "id": 244,
+      "codigo": "PRD-0108",
+      "nombre": "AFOXOCAN 2-4",
+      "precio": 20000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 53,
+      "codigo": "FAR-0021",
+      "nombre": "AFOXOCAN 2 A 4 KG",
+      "precio": 20000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 246,
+      "codigo": "PRD-0110",
+      "nombre": "BIBERON",
+      "precio": 25000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 110,
+      "codigo": "PET-0043",
+      "nombre": "MAMADERA",
+      "precio": 25000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 249,
+      "codigo": "PRD-0113",
+      "nombre": "TERMINADOR AVES",
+      "precio": 85000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 23,
+      "codigo": "PET-0021",
+      "nombre": "AVES TERMINADOR 25 KG",
+      "precio": 85000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 250,
+      "codigo": "PRD-0114",
+      "nombre": "BOLSA AFRECHO",
+      "precio": 55000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 119,
+      "codigo": "PET-0052",
+      "nombre": "AFRECHO DE TRIGO",
+      "precio": 60000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 100%."
+  },
+  {
+    "unificar": true,
+    "score": 1,
+    "nuevo_producto": {
+      "id": 252,
+      "codigo": "PRD-0116",
+      "nombre": "CANEX 1",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "FARMACIA"
     },
     "producto_existente": {
-      "id": 66,
-      "codigo": "FAR-0034",
-      "nombre": "FLOXACIN 50MG",
+      "id": 106,
+      "codigo": "PET-0039",
+      "nombre": "CANEX ORIGINAL",
       "precio": 15000,
-      "tipo_inventario": "FARMACIA"
+      "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 93%."
+    "razon": "Similitud de nombre del 100%."
   },
   {
-    "unificar": true,
-    "score": 0.929,
+    "unificar": false,
+    "score": 1,
     "nuevo_producto": {
-      "id": 191,
-      "codigo": "PRD-0055",
-      "nombre": "DOXIVET 100 MG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 34,
-      "codigo": "FAR-0002",
-      "nombre": "DOXIVET 100MG",
-      "precio": 25000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 93%."
-  },
-  {
-    "unificar": true,
-    "score": 0.929,
-    "nuevo_producto": {
-      "id": 196,
-      "codigo": "PRD-0060",
-      "nombre": "DOXIVET 200 MG",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 35,
-      "codigo": "FAR-0003",
-      "nombre": "DOXIVET 200MG",
+      "id": 254,
+      "codigo": "PRD-0118",
+      "nombre": "DOXIVET 20MG",
       "precio": 30000,
       "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 93%."
-  },
-  {
-    "unificar": true,
-    "score": 0.923,
-    "nuevo_producto": {
-      "id": 198,
-      "codigo": "PRD-0062",
-      "nombre": "DEXAGAL 10 ML",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 59,
-      "codigo": "FAR-0027",
-      "nombre": "DEXAGAL 10ML",
-      "precio": 25000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 92%."
-  },
-  {
-    "unificar": true,
-    "score": 0.923,
-    "nuevo_producto": {
-      "id": 224,
-      "codigo": "PRD-0088",
-      "nombre": "DOXIVET 50 MG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
     },
     "producto_existente": {
       "id": 33,
@@ -263,83 +339,7 @@
       "precio": 23000,
       "tipo_inventario": "FARMACIA"
     },
-    "razon": "Similitud de nombre del 92%."
-  },
-  {
-    "unificar": false,
-    "score": 0.923,
-    "nuevo_producto": {
-      "id": 254,
-      "codigo": "PRD-0118",
-      "nombre": "DOXIVET 20MG",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 35,
-      "codigo": "FAR-0003",
-      "nombre": "DOXIVET 200MG",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 92%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg)."
-  },
-  {
-    "unificar": true,
-    "score": 0.909,
-    "nuevo_producto": {
-      "id": 145,
-      "codigo": "PRD-0009",
-      "nombre": "PRONTO DOG ADULTO 7 KG",
-      "precio": 75000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 12,
-      "codigo": "PET-0010",
-      "nombre": "PRONTODOG ADULTOS 7 KG",
-      "precio": 70000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 91%."
-  },
-  {
-    "unificar": false,
-    "score": 0.909,
-    "nuevo_producto": {
-      "id": 176,
-      "codigo": "PRD-0040",
-      "nombre": "AVES CRECIMIENTO 3 KG",
-      "precio": 15000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 22,
-      "codigo": "PET-0020",
-      "nombre": "AVES CRECIMIENTO 25 KG",
-      "precio": 85000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 91%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
-  },
-  {
-    "unificar": true,
-    "score": 0.903,
-    "nuevo_producto": {
-      "id": 151,
-      "codigo": "PRD-0015",
-      "nombre": "PRONTO DOG RAZAS PEQUEÑAS 1,5 KG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 14,
-      "codigo": "PET-0012",
-      "nombre": "PRONTODOG RAZA PEQUEÑA 1.5 KG",
-      "precio": 25000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 90%."
+    "razon": "Similitud de nombre del 100%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4)."
   },
   {
     "unificar": false,
@@ -349,7 +349,7 @@
       "codigo": "PRD-0033",
       "nombre": "AVE CRECIMIENTO 3 KG",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 22,
@@ -358,42 +358,23 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 86%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
-  },
-  {
-    "unificar": true,
-    "score": 0.857,
-    "nuevo_producto": {
-      "id": 239,
-      "codigo": "PRD-0103",
-      "nombre": "VETCORD",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 47,
-      "codigo": "FAR-0015",
-      "nombre": "VETCORT",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 86%."
+    "razon": "Similitud de nombre del 86%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
   },
   {
     "unificar": true,
     "score": 0.85,
     "nuevo_producto": {
-      "id": 137,
-      "codigo": "PRD-0001",
-      "nombre": "SEPTUPLE",
-      "precio": 50000,
-      "tipo_inventario": "AMBOS"
+      "id": 204,
+      "codigo": "PRD-0068",
+      "nombre": "ANALGECIN",
+      "precio": 30000,
+      "tipo_inventario": "FARMACIA"
     },
     "producto_existente": {
-      "id": 122,
-      "codigo": "FAR-0066",
-      "nombre": "VACUNA SEPTUPLE QUANTUM",
-      "precio": 50000,
+      "id": 39,
+      "codigo": "FAR-0007",
+      "nombre": "ANALGESIN PET GOTAS",
+      "precio": 30000,
       "tipo_inventario": "FARMACIA"
     },
     "razon": "Similitud de nombre del 85%."
@@ -402,16 +383,16 @@
     "unificar": true,
     "score": 0.85,
     "nuevo_producto": {
-      "id": 158,
-      "codigo": "PRD-0022",
-      "nombre": "PERIDON",
+      "id": 229,
+      "codigo": "PRD-0093",
+      "nombre": "L. BIOMISOL",
       "precio": 25000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "FARMACIA"
     },
     "producto_existente": {
-      "id": 81,
-      "codigo": "FAR-0049",
-      "nombre": "PERIDON GOTAS 20ML",
+      "id": 74,
+      "codigo": "FAR-0042",
+      "nombre": "L-BIOMISOL 7.5 30ML",
       "precio": 25000,
       "tipo_inventario": "FARMACIA"
     },
@@ -421,28 +402,9 @@
     "unificar": true,
     "score": 0.85,
     "nuevo_producto": {
-      "id": 161,
-      "codigo": "PRD-0025",
-      "nombre": "FINESTROL DOSIS",
-      "precio": 20000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 63,
-      "codigo": "FAR-0031",
-      "nombre": "FINESTROL",
-      "precio": 25000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 164,
-      "codigo": "PRD-0028",
-      "nombre": "GASIPLEN",
+      "id": 242,
+      "codigo": "PRD-0106",
+      "nombre": "GAVIPLEN",
       "precio": 25000,
       "tipo_inventario": "AMBOS"
     },
@@ -457,640 +419,13 @@
   },
   {
     "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 170,
-      "codigo": "PRD-0034",
-      "nombre": "ENGORDE CAMPO",
-      "precio": 70000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 30,
-      "codigo": "PET-0028",
-      "nombre": "ENGORDE CAMPO 25 KG",
-      "precio": 75000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 178,
-      "codigo": "PRD-0042",
-      "nombre": "DECTOMAX",
-      "precio": 70000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 103,
-      "codigo": "FAR-0065",
-      "nombre": "DECTOMAX INYEC",
-      "precio": 70000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 183,
-      "codigo": "PRD-0047",
-      "nombre": "LECHERA",
-      "precio": 70000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 29,
-      "codigo": "PET-0027",
-      "nombre": "LECHERAS A.P. 18% - 25 KG",
-      "precio": 75000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 184,
-      "codigo": "PRD-0048",
-      "nombre": "ENGORDE",
-      "precio": 70000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 30,
-      "codigo": "PET-0028",
-      "nombre": "ENGORDE CAMPO 25 KG",
-      "precio": 75000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 188,
-      "codigo": "PRD-0052",
-      "nombre": "HEPACURA 20 KG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 44,
-      "codigo": "FAR-0012",
-      "nombre": "HEPACURA",
-      "precio": 25000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 192,
-      "codigo": "PRD-0056",
-      "nombre": "PONEDORA",
-      "precio": 95000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 24,
-      "codigo": "PET-0022",
-      "nombre": "AVES PONEDORA 25 KG",
-      "precio": 95000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 195,
-      "codigo": "PRD-0059",
-      "nombre": "EQUINO",
-      "precio": 150000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 32,
-      "codigo": "PET-0030",
-      "nombre": "EQUINO INTEGRAL 50 KG",
-      "precio": 150000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 199,
-      "codigo": "PRD-0063",
-      "nombre": "COMEDERO PARA GALLINA",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 121,
-      "codigo": "PET-0054",
-      "nombre": "COMEDERO PARA GALLINAS 3 KG",
-      "precio": 30000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 207,
-      "codigo": "PRD-0071",
-      "nombre": "VACUNA SEPTUPLE",
-      "precio": 50000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 122,
-      "codigo": "FAR-0066",
-      "nombre": "VACUNA SEPTUPLE QUANTUM",
-      "precio": 50000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 212,
-      "codigo": "PRD-0076",
-      "nombre": "AFRECHO",
-      "precio": 60000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 119,
-      "codigo": "PET-0052",
-      "nombre": "AFRECHO DE TRIGO",
-      "precio": 60000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 226,
-      "codigo": "PRD-0090",
-      "nombre": "VETCOR",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 47,
-      "codigo": "FAR-0015",
-      "nombre": "VETCORT",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 228,
-      "codigo": "PRD-0092",
-      "nombre": "EXTRACTO DE HIGADO",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 86,
-      "codigo": "FAR-0054",
-      "nombre": "EXTRACTO DE HIGADO GALMEDIC 100ML",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": false,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 229,
-      "codigo": "PRD-0093",
-      "nombre": "L. BIOMISOL",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 1,
-      "codigo": "CLI-0001",
-      "nombre": "BIOMISOL",
-      "precio": 10000,
-      "tipo_inventario": "CLINICA"
-    },
-    "razon": "Similitud de nombre del 85%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (25.000 GS vs 10.000 GS)."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 231,
-      "codigo": "PRD-0095",
-      "nombre": "CANEX",
-      "precio": 12500,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 106,
-      "codigo": "PET-0039",
-      "nombre": "CANEX ORIGINAL",
-      "precio": 15000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 233,
-      "codigo": "PRD-0097",
-      "nombre": "MULTIVITAMIN",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 77,
-      "codigo": "FAR-0045",
-      "nombre": "MULTIVITAMIN 250 GRAMOS",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 240,
-      "codigo": "PRD-0104",
-      "nombre": "TERRAMICINA",
-      "precio": 65000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 101,
-      "codigo": "FAR-0063",
-      "nombre": "TERRAMICINA EN POLVO",
-      "precio": 65000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 241,
-      "codigo": "PRD-0105",
-      "nombre": "DOXIVET 200",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 35,
-      "codigo": "FAR-0003",
-      "nombre": "DOXIVET 200MG",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 251,
-      "codigo": "PRD-0115",
-      "nombre": "VACUNA",
-      "precio": 50000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 122,
-      "codigo": "FAR-0066",
-      "nombre": "VACUNA SEPTUPLE QUANTUM",
-      "precio": 50000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.85,
-    "nuevo_producto": {
-      "id": 255,
-      "codigo": "PRD-0119",
-      "nombre": "SOBRE VITABIOT FTE",
-      "precio": 10000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 69,
-      "codigo": "FAR-0037",
-      "nombre": "VITABIOT",
-      "precio": 10000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.846,
-    "nuevo_producto": {
-      "id": 146,
-      "codigo": "PRD-0010",
-      "nombre": "DEXAYAL 10 ML",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 59,
-      "codigo": "FAR-0027",
-      "nombre": "DEXAGAL 10ML",
-      "precio": 25000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": false,
-    "score": 0.846,
-    "nuevo_producto": {
-      "id": 160,
-      "codigo": "PRD-0024",
-      "nombre": "CONEJO 2 KG",
-      "precio": 10000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 28,
-      "codigo": "PET-0026",
-      "nombre": "CONEJOS 25 KG",
-      "precio": 85000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
-  },
-  {
-    "unificar": true,
-    "score": 0.846,
-    "nuevo_producto": {
-      "id": 220,
-      "codigo": "PRD-0084",
-      "nombre": "PRONTO CAT CASTRADO 2.7",
-      "precio": 75000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 126,
-      "codigo": "PET-0055",
-      "nombre": "PRONTO CAT CASTRADOS 2,7 KG",
-      "precio": 75000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 85%."
-  },
-  {
-    "unificar": true,
-    "score": 0.842,
-    "nuevo_producto": {
-      "id": 140,
-      "codigo": "PRD-0004",
-      "nombre": "AFOXOCAN 10-25 KG",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 54,
-      "codigo": "FAR-0022",
-      "nombre": "AFOXOCAN 10 A 25 KG",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 84%."
-  },
-  {
-    "unificar": true,
-    "score": 0.833,
-    "nuevo_producto": {
-      "id": 156,
-      "codigo": "PRD-0020",
-      "nombre": "PRONTO DOG CACHORRO 1.5",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 3,
-      "codigo": "PET-0001",
-      "nombre": "PRONTODOG CACHORRO 1.5 KG",
-      "precio": 25000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 83%."
-  },
-  {
-    "unificar": true,
-    "score": 0.833,
-    "nuevo_producto": {
-      "id": 185,
-      "codigo": "PRD-0049",
-      "nombre": "RIFAG",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 42,
-      "codigo": "FAR-0010",
-      "nombre": "RIFA G",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 83%."
-  },
-  {
-    "unificar": true,
-    "score": 0.833,
-    "nuevo_producto": {
-      "id": 230,
-      "codigo": "PRD-0094",
-      "nombre": "PRONTO DOG CACHORRO 2.7",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 4,
-      "codigo": "PET-0002",
-      "nombre": "PRONTODOG CACHORRO 2.7 KG",
-      "precio": 35000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 83%."
-  },
-  {
-    "unificar": true,
-    "score": 0.833,
-    "nuevo_producto": {
-      "id": 236,
-      "codigo": "PRD-0100",
-      "nombre": "IVET-PETS CMP",
-      "precio": 43000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 43,
-      "codigo": "FAR-0011",
-      "nombre": "IVET PET CMP",
-      "precio": 43000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 83%."
-  },
-  {
-    "unificar": true,
-    "score": 0.824,
-    "nuevo_producto": {
-      "id": 157,
-      "codigo": "PRD-0021",
-      "nombre": "AFOXOCAN 2-4 KG",
-      "precio": 20000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 53,
-      "codigo": "FAR-0021",
-      "nombre": "AFOXOCAN 2 A 4 KG",
-      "precio": 20000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 82%."
-  },
-  {
-    "unificar": true,
-    "score": 0.8,
-    "nuevo_producto": {
-      "id": 238,
-      "codigo": "PRD-0102",
-      "nombre": "PRONTO DOG CACHORRO DE 2.7",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 3,
-      "codigo": "PET-0001",
-      "nombre": "PRONTODOG CACHORRO 1.5 KG",
-      "precio": 25000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 80%."
-  },
-  {
-    "unificar": true,
-    "score": 0.793,
-    "nuevo_producto": {
-      "id": 202,
-      "codigo": "PRD-0066",
-      "nombre": "PRONTO CAT CRECIMIENTO ADULTO",
-      "precio": 240000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 127,
-      "codigo": "PET-0056",
-      "nombre": "PRONTO CAT CRECIMIENTO 25 KG",
-      "precio": 245000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 79%."
-  },
-  {
-    "unificar": true,
-    "score": 0.783,
-    "nuevo_producto": {
-      "id": 165,
-      "codigo": "PRD-0029",
-      "nombre": "PRONTO DOG ADULTO 2,7",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 11,
-      "codigo": "PET-0009",
-      "nombre": "PRONTODOG ADULTOS 2.7 KG",
-      "precio": 35000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 78%."
-  },
-  {
-    "unificar": true,
-    "score": 0.778,
-    "nuevo_producto": {
-      "id": 197,
-      "codigo": "PRD-0061",
-      "nombre": "FLOXACIN DE 150 MG",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 65,
-      "codigo": "FAR-0033",
-      "nombre": "FLOXACIN 150MG",
-      "precio": 20000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 78%."
-  },
-  {
-    "unificar": true,
-    "score": 0.765,
-    "nuevo_producto": {
-      "id": 168,
-      "codigo": "PRD-0032",
-      "nombre": "PRONTO CAT CRECIMIENTO ADULTO 1 KG",
-      "precio": 20000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 17,
-      "codigo": "PET-0015",
-      "nombre": "PRONTOCAT CRECIMIENTOS 1 KG",
-      "precio": 20000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 76%."
-  },
-  {
-    "unificar": false,
-    "score": 0.741,
+    "score": 0.75,
     "nuevo_producto": {
       "id": 163,
       "codigo": "PRD-0027",
       "nombre": "PRONTO DOG RAZAS PEQUEÑAS",
       "precio": 80000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 16,
@@ -1099,17 +434,36 @@
       "precio": 80000,
       "tipo_inventario": "PETSHOP"
     },
+    "razon": "Similitud de nombre del 75%."
+  },
+  {
+    "unificar": true,
+    "score": 0.737,
+    "nuevo_producto": {
+      "id": 203,
+      "codigo": "PRD-0067",
+      "nombre": "ANALGECIN PETS",
+      "precio": 30000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "producto_existente": {
+      "id": 39,
+      "codigo": "FAR-0007",
+      "nombre": "ANALGESIN PET GOTAS",
+      "precio": 30000,
+      "tipo_inventario": "FARMACIA"
+    },
     "razon": "Similitud de nombre del 74%."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.735,
     "nuevo_producto": {
       "id": 143,
       "codigo": "PRD-0007",
       "nombre": "PRONTO GAT CRECIMIENTO ADULTO 1 KG",
       "precio": 20000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 17,
@@ -1121,14 +475,14 @@
     "razon": "Similitud de nombre del 74%."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.735,
     "nuevo_producto": {
       "id": 144,
       "codigo": "PRD-0008",
       "nombre": "PRONTO GAT CRECIMIENTO ADULTO 7 KG",
       "precio": 85000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 18,
@@ -1143,30 +497,11 @@
     "unificar": false,
     "score": 0.714,
     "nuevo_producto": {
-      "id": 186,
-      "codigo": "PRD-0050",
-      "nombre": "KERTUS SHAMPOO NEUTRO",
-      "precio": 25000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 95,
-      "codigo": "PET-0033",
-      "nombre": "KERKUS SHAMPOO COCO",
-      "precio": 70000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 71%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (25.000 GS vs 70.000 GS)."
-  },
-  {
-    "unificar": false,
-    "score": 0.714,
-    "nuevo_producto": {
       "id": 201,
       "codigo": "PRD-0065",
       "nombre": "AVES CRECIMIENTO GRANEL 3 KG",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 22,
@@ -1175,7 +510,7 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
+    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
   },
   {
     "unificar": false,
@@ -1185,7 +520,7 @@
       "codigo": "PRD-0078",
       "nombre": "AVES CRECIMIENTO GRANEL 2 KG",
       "precio": 10000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 22,
@@ -1194,7 +529,7 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
+    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
   },
   {
     "unificar": false,
@@ -1204,7 +539,7 @@
       "codigo": "PRD-0005",
       "nombre": "AVES PONEDORA GRANEL 3KG",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 24,
@@ -1213,26 +548,7 @@
       "precio": 95000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 95.000 GS)."
-  },
-  {
-    "unificar": false,
-    "score": 0.696,
-    "nuevo_producto": {
-      "id": 173,
-      "codigo": "PRD-0037",
-      "nombre": "CERDO TERMINADOR",
-      "precio": 75000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 27,
-      "codigo": "PET-0025",
-      "nombre": "CERDOS TERMINADOR 25 KG",
-      "precio": 80000,
-      "tipo_inventario": "PETSHOP"
-    },
-    "razon": "Similitud de nombre del 70%."
+    "razon": "Similitud de nombre del 71%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 95.000 GS)."
   },
   {
     "unificar": false,
@@ -1242,7 +558,7 @@
       "codigo": "PRD-0006",
       "nombre": "AVES CRECIMIENTO GRANEL 3K",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 22,
@@ -1251,7 +567,7 @@
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
+    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 85.000 GS)."
   },
   {
     "unificar": false,
@@ -1261,7 +577,7 @@
       "codigo": "PRD-0069",
       "nombre": "AVES INICIADOR GRANEL 3 KG",
       "precio": 15000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 21,
@@ -1270,7 +586,7 @@
       "precio": 95000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 95.000 GS)."
+    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (15.000 GS vs 95.000 GS)."
   },
   {
     "unificar": false,
@@ -1280,7 +596,7 @@
       "codigo": "PRD-0098",
       "nombre": "PRONTO CAT GRANEL 2 KG",
       "precio": 10000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 126,
@@ -1289,17 +605,17 @@
       "precio": 75000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 75.000 GS)."
+    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 75.000 GS)."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.692,
     "nuevo_producto": {
       "id": 247,
       "codigo": "PRD-0111",
       "nombre": "DOXI 100 MG",
       "precio": 25000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "FARMACIA"
     },
     "producto_existente": {
       "id": 34,
@@ -1318,7 +634,7 @@
       "codigo": "PRD-0072",
       "nombre": "PRONTO DOG ADULTO GRANEL 1 KG",
       "precio": 10000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 10,
@@ -1327,17 +643,17 @@
       "precio": 25000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 25.000 GS)."
+    "razon": "Similitud de nombre del 69%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 25.000 GS)."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.688,
     "nuevo_producto": {
       "id": 248,
       "codigo": "PRD-0112",
       "nombre": "DOXIVET 200 X 10",
       "precio": 30000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "FARMACIA"
     },
     "producto_existente": {
       "id": 35,
@@ -1352,30 +668,11 @@
     "unificar": false,
     "score": 0.684,
     "nuevo_producto": {
-      "id": 149,
-      "codigo": "PRD-0013",
-      "nombre": "AFOXOPET 10-25 KG",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 54,
-      "codigo": "FAR-0022",
-      "nombre": "AFOXOCAN 10 A 25 KG",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 68%."
-  },
-  {
-    "unificar": false,
-    "score": 0.684,
-    "nuevo_producto": {
       "id": 159,
       "codigo": "PRD-0023",
       "nombre": "PONEDORA 2 KG",
       "precio": 10000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 24,
@@ -1384,48 +681,10 @@
       "precio": 95000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 68%. ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 95.000 GS)."
+    "razon": "Similitud de nombre del 68%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 95.000 GS)."
   },
   {
-    "unificar": false,
-    "score": 0.684,
-    "nuevo_producto": {
-      "id": 162,
-      "codigo": "PRD-0026",
-      "nombre": "AFOXOCAN 10-25",
-      "precio": 35000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 54,
-      "codigo": "FAR-0022",
-      "nombre": "AFOXOCAN 10 A 25 KG",
-      "precio": 35000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 68%."
-  },
-  {
-    "unificar": false,
-    "score": 0.684,
-    "nuevo_producto": {
-      "id": 203,
-      "codigo": "PRD-0067",
-      "nombre": "ANALGECIN PETS",
-      "precio": 30000,
-      "tipo_inventario": "AMBOS"
-    },
-    "producto_existente": {
-      "id": 39,
-      "codigo": "FAR-0007",
-      "nombre": "ANALGESIN PET GOTAS",
-      "precio": 30000,
-      "tipo_inventario": "FARMACIA"
-    },
-    "razon": "Similitud de nombre del 68%."
-  },
-  {
-    "unificar": false,
+    "unificar": true,
     "score": 0.667,
     "nuevo_producto": {
       "id": 155,
@@ -1444,33 +703,33 @@
     "razon": "Similitud de nombre del 67%."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.667,
     "nuevo_producto": {
-      "id": 166,
-      "codigo": "PRD-0030",
-      "nombre": "EQUINO 50 KG",
-      "precio": 150000,
+      "id": 193,
+      "codigo": "PRD-0057",
+      "nombre": "IVET-PETS",
+      "precio": 45000,
       "tipo_inventario": "AMBOS"
     },
     "producto_existente": {
-      "id": 32,
-      "codigo": "PET-0030",
-      "nombre": "EQUINO INTEGRAL 50 KG",
-      "precio": 150000,
-      "tipo_inventario": "PETSHOP"
+      "id": 43,
+      "codigo": "FAR-0011",
+      "nombre": "IVET PET CMP",
+      "precio": 43000,
+      "tipo_inventario": "FARMACIA"
     },
     "razon": "Similitud de nombre del 67%."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.667,
     "nuevo_producto": {
       "id": 211,
       "codigo": "PRD-0075",
       "nombre": "SEPTUPLE VACUNA",
       "precio": 50000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "CLINICA"
     },
     "producto_existente": {
       "id": 122,
@@ -1482,14 +741,14 @@
     "razon": "Similitud de nombre del 67%."
   },
   {
-    "unificar": false,
+    "unificar": true,
     "score": 0.667,
     "nuevo_producto": {
       "id": 216,
       "codigo": "PRD-0080",
       "nombre": "PATÉ CAT CHOW ADULTO PESCADO",
       "precio": 8000,
-      "tipo_inventario": "AMBOS"
+      "tipo_inventario": "PETSHOP"
     },
     "producto_existente": {
       "id": 113,
@@ -1501,22 +760,345 @@
     "razon": "Similitud de nombre del 67%."
   },
   {
-    "unificar": false,
-    "score": 0.667,
+    "unificar": true,
+    "score": 0.65,
     "nuevo_producto": {
-      "id": 249,
-      "codigo": "PRD-0113",
-      "nombre": "TERMINADOR AVES",
-      "precio": 85000,
+      "id": 215,
+      "codigo": "PRD-0079",
+      "nombre": "AFOXOCAN 4-10",
+      "precio": 25000,
       "tipo_inventario": "AMBOS"
     },
     "producto_existente": {
-      "id": 23,
-      "codigo": "PET-0021",
-      "nombre": "AVES TERMINADOR 25 KG",
+      "id": 84,
+      "codigo": "FAR-0052",
+      "nombre": "AFOXOCAN DE 4 A 10KG",
+      "precio": 25000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 65%."
+  },
+  {
+    "unificar": true,
+    "score": 0.65,
+    "nuevo_producto": {
+      "id": 232,
+      "codigo": "PRD-0096",
+      "nombre": "AFOXOPET 4-10",
+      "precio": 25000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 84,
+      "codigo": "FAR-0052",
+      "nombre": "AFOXOCAN DE 4 A 10KG",
+      "precio": 25000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 65%."
+  },
+  {
+    "unificar": false,
+    "score": 0.632,
+    "nuevo_producto": {
+      "id": 171,
+      "codigo": "PRD-0035",
+      "nombre": "AVE PONEDORA",
+      "precio": 187000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 24,
+      "codigo": "PET-0022",
+      "nombre": "AVES PONEDORA 25 KG",
+      "precio": 95000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 63%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (187.000 GS vs 95.000 GS)."
+  },
+  {
+    "unificar": false,
+    "score": 0.632,
+    "nuevo_producto": {
+      "id": 174,
+      "codigo": "PRD-0038",
+      "nombre": "PONEDORA 4 KG",
+      "precio": 20000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 24,
+      "codigo": "PET-0022",
+      "nombre": "AVES PONEDORA 25 KG",
+      "precio": 95000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 63%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (20.000 GS vs 95.000 GS)."
+  },
+  {
+    "unificar": true,
+    "score": 0.619,
+    "nuevo_producto": {
+      "id": 186,
+      "codigo": "PRD-0050",
+      "nombre": "KERTUS SHAMPOO NEUTRO",
+      "precio": 25000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 98,
+      "codigo": "FAR-0061",
+      "nombre": "KERKUS SAHMPOO ANTI",
+      "precio": 28000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 62%."
+  },
+  {
+    "unificar": true,
+    "score": 0.593,
+    "nuevo_producto": {
+      "id": 177,
+      "codigo": "PRD-0041",
+      "nombre": "KG PRONTO DOG ADULTO GRANEL",
+      "precio": 20000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 10,
+      "codigo": "PET-0008",
+      "nombre": "PRONTODOG ADULTOS 1.5 KG",
+      "precio": 25000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 59%."
+  },
+  {
+    "unificar": false,
+    "score": 0.579,
+    "nuevo_producto": {
+      "id": 187,
+      "codigo": "PRD-0051",
+      "nombre": "PONEDORA (KG)",
+      "precio": 5000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 24,
+      "codigo": "PET-0022",
+      "nombre": "AVES PONEDORA 25 KG",
+      "precio": 95000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 58%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (5.000 GS vs 95.000 GS)."
+  },
+  {
+    "unificar": true,
+    "score": 0.571,
+    "nuevo_producto": {
+      "id": 166,
+      "codigo": "PRD-0030",
+      "nombre": "EQUINO 50 KG",
+      "precio": 150000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 32,
+      "codigo": "PET-0030",
+      "nombre": "EQUINO INTEGRAL 50 KG",
+      "precio": 150000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 57%."
+  },
+  {
+    "unificar": true,
+    "score": 0.533,
+    "nuevo_producto": {
+      "id": 147,
+      "codigo": "PRD-0011",
+      "nombre": "TIMPANCIN",
+      "precio": 20000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "producto_existente": {
+      "id": 82,
+      "codigo": "FAR-0050",
+      "nombre": "TIMPANSIN 100ML",
+      "precio": 20000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 53%."
+  },
+  {
+    "unificar": true,
+    "score": 0.533,
+    "nuevo_producto": {
+      "id": 209,
+      "codigo": "PRD-0073",
+      "nombre": "FINESTREL DOSIS",
+      "precio": 20000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 63,
+      "codigo": "FAR-0031",
+      "nombre": "FINESTROL",
+      "precio": 25000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 53%."
+  },
+  {
+    "unificar": false,
+    "score": 0.529,
+    "nuevo_producto": {
+      "id": 181,
+      "codigo": "PRD-0045",
+      "nombre": "IVERMIC 0,5 ML",
+      "precio": 5000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "producto_existente": {
+      "id": 70,
+      "codigo": "FAR-0038",
+      "nombre": "IVERM INYECT500ML",
+      "precio": 500000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 53%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (5.000 GS vs 500.000 GS)."
+  },
+  {
+    "unificar": false,
+    "score": 0.52,
+    "nuevo_producto": {
+      "id": 175,
+      "codigo": "PRD-0039",
+      "nombre": "PRONTO CAT GRANEL",
+      "precio": 5000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 19,
+      "codigo": "PET-0017",
+      "nombre": "PRONTO CAT CASTRADOS 1 KG",
+      "precio": 30000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 52%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (5.000 GS vs 30.000 GS)."
+  },
+  {
+    "unificar": false,
+    "score": 0.5,
+    "nuevo_producto": {
+      "id": 179,
+      "codigo": "PRD-0043",
+      "nombre": "AGUJAS",
+      "precio": 5000,
+      "tipo_inventario": "CLINICA"
+    },
+    "producto_existente": {
+      "id": 111,
+      "codigo": "PET-0044",
+      "nombre": "JAULAS",
+      "precio": 80000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 50%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (5.000 GS vs 80.000 GS). ⚠️ Cero coincidencia de palabras significativas."
+  },
+  {
+    "unificar": false,
+    "score": 0.5,
+    "nuevo_producto": {
+      "id": 180,
+      "codigo": "PRD-0044",
+      "nombre": "JERINGA 5 ML",
+      "precio": 5000,
+      "tipo_inventario": "CLINICA"
+    },
+    "producto_existente": {
+      "id": 81,
+      "codigo": "FAR-0049",
+      "nombre": "PERIDON GOTAS 20ML",
+      "precio": 25000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "razon": "Similitud de nombre del 50%. ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4). ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (5.000 GS vs 25.000 GS). ⚠️ Cero coincidencia de palabras significativas."
+  },
+  {
+    "unificar": true,
+    "score": 0.5,
+    "nuevo_producto": {
+      "id": 206,
+      "codigo": "PRD-0070",
+      "nombre": "SAL SUPERMIX",
+      "precio": 90000,
+      "tipo_inventario": "AMBOS"
+    },
+    "producto_existente": {
+      "id": 31,
+      "codigo": "PET-0029",
+      "nombre": "SAL MINERAL",
+      "precio": 90000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 50%."
+  },
+  {
+    "unificar": true,
+    "score": 0.5,
+    "nuevo_producto": {
+      "id": 217,
+      "codigo": "PRD-0081",
+      "nombre": "PATÉ CAT CHOW GATITOS",
+      "precio": 8000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 115,
+      "codigo": "PET-0048",
+      "nombre": "CAT CHOW GATITOS POLLO 15X85G",
+      "precio": 8000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 50%."
+  },
+  {
+    "unificar": false,
+    "score": 0.5,
+    "nuevo_producto": {
+      "id": 253,
+      "codigo": "PRD-0117",
+      "nombre": "RACIÓN PARA CONEJO",
+      "precio": 10000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "producto_existente": {
+      "id": 28,
+      "codigo": "PET-0026",
+      "nombre": "CONEJOS 25 KG",
       "precio": 85000,
       "tipo_inventario": "PETSHOP"
     },
-    "razon": "Similitud de nombre del 67%."
+    "razon": "Similitud de nombre del 50%. ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (10.000 GS vs 85.000 GS)."
+  },
+  {
+    "unificar": false,
+    "score": 0.476,
+    "nuevo_producto": {
+      "id": 243,
+      "codigo": "PRD-0107",
+      "nombre": "PIPETA CLAZIC",
+      "precio": 30000,
+      "tipo_inventario": "FARMACIA"
+    },
+    "producto_existente": {
+      "id": 131,
+      "codigo": "PET-0060",
+      "nombre": "PIPICAT CLASIC DE 4KG",
+      "precio": 30000,
+      "tipo_inventario": "PETSHOP"
+    },
+    "razon": "Similitud de nombre del 48%."
   }
 ]

@@ -41,29 +41,82 @@ function levenshtein(a, b) {
 
 function cleanString(str) {
   if (!str) return '';
-  return str.toLowerCase()
+  let cleaned = str.toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "") // quitar acentos
+    .replace(/[-/.]/g, ' ')          // reemplazar guiones, barras y puntos por espacios
     .replace(/[^a-z0-9\s]/g, '')     // quitar caracteres especiales
     .replace(/\s+/g, ' ')
     .trim();
+
+  // Aplicar equivalencias o sinónimos de productos conocidos
+  if (cleaned.includes('afoxopet')) {
+    cleaned = cleaned.replace('afoxopet', 'afoxocan');
+  }
+  if (cleaned.includes('biberon')) {
+    cleaned = cleaned.replace('biberon', 'mamadera');
+  }
+  if (cleaned.includes('xixi')) {
+    cleaned = 'kit educador';
+  }
+  if (cleaned.includes('cepillo con pasta')) {
+    cleaned = cleaned.replace('cepillo con pasta dental', 'kit cepillo').replace('cepillo con pasta', 'kit cepillo');
+  }
+  if (cleaned.includes('bolsa afrecho') || cleaned === 'afrecho bolsa') {
+    cleaned = 'afrecho de trigo';
+  }
+  if (cleaned.includes('analgecin')) {
+    cleaned = cleaned.replace('analgecin', 'analgesin');
+  }
+  if (cleaned.includes('comp canex') || cleaned.includes('canex comp') || cleaned === 'canex 1') {
+    cleaned = 'canex original';
+  }
+  if (cleaned.includes('gaviplen gotas') || cleaned === 'gaviplen gotas') {
+    cleaned = 'gasiplen oral 20 ml';
+  } else if (cleaned.includes('gaviplen')) {
+    cleaned = cleaned.replace('gaviplen', 'gasiplen');
+  }
+
+  return cleaned;
 }
 
-// Similitud de Jaccard basada en palabras
-function jaccardSimilarity(str1, str2) {
+function wordsMatch(w1, w2) {
+  if (w1 === w2) return true;
+  const len1 = w1.length;
+  const len2 = w2.length;
+  if (Math.min(len1, len2) >= 4 && (w1.startsWith(w2) || w2.startsWith(w1))) return true;
+  if (Math.abs(len1 - len2) > 1) return false;
+  const dist = levenshtein(w1, w2);
+  if (dist <= 1 && Math.min(len1, len2) >= 4) return true;
+  return false;
+}
+
+// Similitud de Jaccard basada en palabras con coincidencia difusa (Fuzzy Jaccard)
+function fuzzyJaccardSimilarity(str1, str2) {
   const stopWords = ['de', 'para', 'con', 'kg', 'ml', 'la', 'el', 'un', 'x', 'y', 'del', 'los', 'las'];
-  const words1 = new Set(cleanString(str1).split(' ').filter(w => w.length > 1 && !stopWords.includes(w)));
-  const words2 = new Set(cleanString(str2).split(' ').filter(w => w.length > 1 && !stopWords.includes(w)));
+  const words1 = cleanString(str1).split(' ').filter(w => w.length > 1 && !stopWords.includes(w) && !/^\d+$/.test(w));
+  const words2 = cleanString(str2).split(' ').filter(w => w.length > 1 && !stopWords.includes(w) && !/^\d+$/.test(w));
   
-  if (words1.size === 0 || words2.size === 0) return 0;
+  if (words1.length === 0 || words2.length === 0) return 0;
   
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
-  const union = new Set([...words1, ...words2]);
+  let intersectionCount = 0;
+  const matched2 = new Set();
   
-  return intersection.size / union.size;
+  for (const w1 of words1) {
+    for (const w2 of words2) {
+      if (!matched2.has(w2) && wordsMatch(w1, w2)) {
+        intersectionCount++;
+        matched2.add(w2);
+        break;
+      }
+    }
+  }
+  
+  const unionCount = words1.length + words2.length - intersectionCount;
+  return intersectionCount / unionCount;
 }
 
-// Obtener puntaje de similitud combinando Levenshtein y Jaccard
+// Obtener puntaje de similitud combinando Levenshtein y Fuzzy Jaccard
 function getSimilarityScore(name1, name2) {
   const c1 = cleanString(name1);
   const c2 = cleanString(name2);
@@ -77,7 +130,7 @@ function getSimilarityScore(name1, name2) {
     }
   }
   
-  const jaccard = jaccardSimilarity(name1, name2);
+  const jaccard = fuzzyJaccardSimilarity(name1, name2);
   
   const maxLen = Math.max(c1.length, c2.length);
   const levDist = levenshtein(c1, c2);
@@ -120,6 +173,30 @@ function hasMeasureConflict(name1, name2) {
   return false;
 }
 
+// Verificar si hay conflicto de números (ej. AFOXOCAN 4-10 tiene max 10 y AFOXOCAN 2 A 4 KG tiene max 4)
+function hasNumberConflict(name1, name2) {
+  const getNumbers = (str) => {
+    const regex = /\b\d+(?:[.,]\d+)?\b|\d+(?=[a-zA-Z])/g;
+    const nums = [];
+    let match;
+    while ((match = regex.exec(str)) !== null) {
+      const val = parseFloat(match[0].replace(',', '.'));
+      if (!isNaN(val)) nums.push(val);
+    }
+    return nums;
+  };
+  
+  const n1 = getNumbers(name1);
+  const n2 = getNumbers(name2);
+  
+  if (n1.length > 0 && n2.length > 0) {
+    const max1 = Math.max(...n1);
+    const max2 = Math.max(...n2);
+    if (max1 !== max2) return true; // Conflicto de dosificación o tamaño máximo
+  }
+  return false;
+}
+
 async function main() {
   const client = await pool.connect();
   try {
@@ -141,42 +218,75 @@ async function main() {
       let bestMatch = null;
       let bestScore = 0;
       
+      const p1 = parseFloat(np.precio_venta_menor) || 0;
+      
       for (const ep of existingProducts) {
         if (ep.codigo === 'PRD-COMPRA-HISTORICA' || ep.codigo === 'PRD-HISTORICO') continue;
         
         const score = getSimilarityScore(np.nombre, ep.nombre);
-        if (score > bestScore) {
-          bestScore = score;
-          bestMatch = ep;
-        }
-      }
-      
-      if (bestScore >= 0.65) {
-        const p1 = parseFloat(np.precio_venta_menor) || 0;
-        const p2 = parseFloat(bestMatch.precio_venta_menor) || 0;
+        if (score < 0.45) continue; // Umbral mínimo de similitud
         
-        let unificar = bestScore >= 0.75;
-        let razon = `Similitud de nombre del ${(bestScore * 100).toFixed(0)}%.`;
+        const p2 = parseFloat(ep.precio_venta_menor) || 0;
+        let conflict = false;
+        let razon = `Similitud de nombre del ${(score * 100).toFixed(0)}%.`;
         
-        // 1. Filtrar por conflicto de medidas
-        if (hasMeasureConflict(np.nombre, bestMatch.nombre)) {
-          unificar = false;
-          razon += ' ⚠️ CONFLICTO DE MEDIDA (ej: 2kg vs 25kg).';
+        // 1. Filtrar por conflicto de medidas o números (ej: 2kg vs 25kg, 4-10 vs 2-4)
+        if (hasMeasureConflict(np.nombre, ep.nombre) || hasNumberConflict(np.nombre, ep.nombre)) {
+          conflict = true;
+          razon += ' ⚠️ CONFLICTO DE MEDIDA O DOSIS (ej: 2kg vs 25kg, 4-10 vs 2-4).';
         }
         
-        // 2. Filtrar por diferencia de precio significativa (más del 50% de diferencia)
+        // 2. Filtrar por diferencia de precio significativa (más del 25% de diferencia)
         if (p1 > 0 && p2 > 0) {
           const maxP = Math.max(p1, p2);
           const minP = Math.min(p1, p2);
           const diffRatio = (maxP - minP) / maxP;
-          if (diffRatio > 0.5) {
-            unificar = false;
+          if (diffRatio > 0.25) {
+            conflict = true;
             razon += ` ⚠️ DIFERENCIA DE PRECIO SIGNIFICATIVA (${p1.toLocaleString()} GS vs ${p2.toLocaleString()} GS).`;
           }
         }
         
+        // 3. Filtrar si no hay coincidencia de palabras significativas en absoluto
+        const c1 = cleanString(np.nombre);
+        const c2 = cleanString(ep.nombre);
+        const jaccard = fuzzyJaccardSimilarity(np.nombre, ep.nombre);
+        const maxLen = Math.max(c1.length, c2.length);
+        const levDist = levenshtein(c1, c2);
+        const levRatio = maxLen > 0 ? (maxLen - levDist) / maxLen : 0;
+        
+        if (jaccard === 0 && levRatio < 0.80) {
+          conflict = true;
+          razon += ' ⚠️ Cero coincidencia de palabras significativas.';
+        }
+        
+        // Heurística de selección: preferir no-conflicto sobre conflicto, y a igualdad de estado, mayor similitud
+        let isBetter = false;
+        if (bestMatch === null) {
+          isBetter = true;
+        } else if (!conflict && bestMatch.conflict) {
+          isBetter = true;
+        } else if (conflict === bestMatch.conflict) {
+          isBetter = score > bestScore;
+        }
+        
+        if (isBetter) {
+          bestScore = score;
+          bestMatch = {
+            id: ep.id,
+            codigo: ep.codigo,
+            nombre: ep.nombre,
+            precio: p2,
+            tipo_inventario: ep.tipo_inventario,
+            conflict,
+            reason: razon
+          };
+        }
+      }
+      
+      if (bestMatch !== null) {
         propuesta.push({
-          unificar,
+          unificar: !bestMatch.conflict && bestScore >= 0.50,
           score: parseFloat(bestScore.toFixed(3)),
           nuevo_producto: {
             id: np.id,
@@ -189,10 +299,10 @@ async function main() {
             id: bestMatch.id,
             codigo: bestMatch.codigo,
             nombre: bestMatch.nombre,
-            precio: p2,
+            precio: bestMatch.precio,
             tipo_inventario: bestMatch.tipo_inventario
           },
-          razon
+          razon: bestMatch.reason
         });
       }
     }
