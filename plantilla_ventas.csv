@@ -1,36 +1,228 @@
 ticket;fecha;cliente;ruc_cliente;tipo_pago;codigo_producto;nombre_producto;tipo_inventario;cantidad;precio_unitario;iva_tipo;descuento_item
-V-0001;30/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;70.000;10;0
-V-0002;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;80.000;10;0
-V-0003;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0004;31/mai;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0005;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0006;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0007;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0008;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0009;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0010;01/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;60.000;10;0
-V-0011;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;60.000;10;0
-V-0012;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0013;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;50.000;10;0
-V-0014;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0015;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
-V-0016;02/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
-V-0017;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
-V-0018;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0019;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0020;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
-V-0021;03/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0022;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0023;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0024;04/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0025;06/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;60.000;10;0
-V-0026;06/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0027;08/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0028;09/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;100.000;10;0
-V-0029;09/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0030;10/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;70.000;10;0
-V-0031;13/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;2;80.000;10;0
-V-0032;15/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;30.000;10;0
-V-0033;16/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0034;17/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;50.000;10;0
-V-0035;17/jun;Ocasional;Ocasional ;Efectivo;;Baño Mascota;PETSHOP;1;40.000;10;0
+V-0036;30/mai;Ocasional;;CONTADO;;Septuple;;2;50.000;10;0
+V-0037;30/mai;Ocasional;;CONTADO;;Afoxocan de 10 a 25 kg;;1;35.000;10;0
+V-0038;30/mai;Ocasional;;CONTADO;;Comp Canex;;1;15.000;10;0
+V-0039;30/mai;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0040;30/mai;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0041;30/mai;Ocasional;;CONTADO;;Afoxocan 10-25 kg;;2;35.000;10;0
+V-0042;30/mai;Ocasional;;CONTADO;;Aves Ponedora granel 3kg;;1;15.000;10;0
+V-0043;30/mai;Ocasional;;CONTADO;;Aves Crecimiento granel 3k;;1;15.000;10;0
+V-0044;31/mai;Ocasional;;CONTADO;;Pronto Gat crecimiento Adulto 1 Kg;;1;20.000;10;0
+V-0045;31/mai;Ocasional;;CONTADO;;Pronto Gat crecimiento Adulto 7 Kg;;1;85.000;10;0
+V-0046;31/mai;Ocasional;;CONTADO;;Pronto Dog Adulto 7 Kg;;1;75.000;10;0
+V-0047;31/mai;Ocasional;;CONTADO;;Dexayal 10 ML;;1;25.000;10;0
+V-0048;31/mai;Ocasional;;CONTADO;;Timpancin;;1;20.000;10;0
+V-0049;31/mai;Ocasional;;CONTADO;;Afoxopet 2-4 Kg;;1;20.000;10;0
+V-0050;31/mai;Ocasional;;CONTADO;;Afoxopet 10-25 Kg;;1;35.000;10;0
+V-0051;01/jun;Ocasional;;CONTADO;;Biomisol;;1;15.000;10;0
+V-0052;01/jun;Ocasional;;CONTADO;;Xixi Não - Xixi Sim;;1;32.000;10;0
+V-0053;01/jun;Ocasional;;CONTADO;;Pronto Dog razas pequeñas 1,5 kg;;1;25.000;10;0
+V-0054;01/jun;Ocasional;;CONTADO;;Dosis de 1ML irondel;;1;10.000;10;0
+V-0055;01/jun;Ocasional;;CONTADO;;Paquete Ración Conejo x 2 kg;;1;10.000;10;0
+V-0056;02/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0057;02/jun;Ocasional;;CONTADO;;Floxacin de 50mg;;1;15.000;10;0
+V-0058;02/jun;Ocasional;;CONTADO;;Ivet Pets;;1;43.000;10;0
+V-0059;02/jun;Ocasional;;CONTADO;;Pronto Dog cachorro 1.5;;1;25.000;10;0
+V-0060;02/jun;Ocasional;;CONTADO;;Afoxocan 2-4 Kg;;1;20.000;10;0
+V-0061;02/jun;Ocasional;;CONTADO;;Peridon;;1;25.000;10;0
+V-0062;02/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0063;03/jun;Ocasional;;CONTADO;;Ponedora 2 Kg;;1;10.000;10;0
+V-0064;03/jun;Ocasional;;CONTADO;;Conejo 2 Kg;;1;10.000;10;0
+V-0065;03/jun;Ocasional;;CONTADO;;Finestrol;;1;25.000;10;0
+V-0066;03/jun;Ocasional;;CONTADO;;Aves crecimiento 25 Kg;;1;80.000;10;0
+V-0067;03/jun;Ocasional;;CONTADO;;Vetcort;;1;35.000;10;0
+V-0068;03/jun;Ocasional;;CONTADO;;Finestrol dosis;;1;20.000;10;0
+V-0069;03/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;1;35.000;10;0
+V-0070;04/jun;Ocasional;;CONTADO;;Pronto Dog razas pequeñas;;1;80.000;10;0
+V-0071;04/jun;Ocasional;;CONTADO;;Arena Star pop;;1;30.000;10;0
+V-0072;04/jun;Ocasional;;CONTADO;;Aves terminador 25 Kg;;1;80.000;10;0
+V-0073;04/jun;Ocasional;;CONTADO;;Hepacura;;1;25.000;10;0
+V-0074;04/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000;10;0
+V-0075;04/jun;Ocasional;;CONTADO;;Gasiplen;;1;25.000;10;0
+V-0076;04/jun;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0077;04/jun;Ocasional;;CONTADO;;Pronto Dog Adulto 2,7;;1;35.000;10;0
+V-0078;04/jun;Ocasional;;CONTADO;;Afoxopet 10-25 Kg;;1;35.000;10;0
+V-0079;04/jun;Ocasional;;CONTADO;;Equino 50 Kg;;1;150.000;10;0
+V-0080;04/jun;Ocasional;;CONTADO;;Amoxivet Biotic 500mg;;1;30.000;10;0
+V-0081;04/jun;Ocasional;;CONTADO;;Vetcort;;1;35.000;10;0
+V-0082;04/jun;Ocasional;;CONTADO;;Biomisol;;1;20.000;10;0
+V-0083;04/jun;Ocasional;;CONTADO;;Hepacura;;1;25.000;10;0
+V-0084;04/jun;Ocasional;;CONTADO;;Pronto Cat crecimiento Adulto 1 Kg;;1;20.000;10;0
+V-0085;05/jun;Ocasional;;CONTADO;;Enterogel;;1;25.000;10;0
+V-0086;05/jun;Ocasional;;CONTADO;;Ave crecimiento 3 Kg;;1;15.000;10;0
+V-0087;05/jun;Ocasional;;CONTADO;;Engorde Campo;;1;70.000;10;5000
+V-0088;05/jun;Ocasional;;CONTADO;;Vitabiot;;1;10.000;10;0
+V-0089;05/jun;Ocasional;;CONTADO;;Floxacin de 50mg;;1;15.000;10;0
+V-0090;05/jun;Ocasional;;CONTADO;;Vitabiot;;1;10.000;10;5000
+V-0091;05/jun;Ocasional;;CONTADO;;Aves terminador 25 Kg;;2;165.000;10;Descuento 
+V-0092;05/jun;Ocasional;;CONTADO;;Ave Ponedora;;2;187.000;10;Descuento 
+V-0093;05/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0094;05/jun;Ocasional;;CONTADO;;Rifa G;;1;35.000;10;0
+V-0095;06/jun;Ocasional;;CONTADO;;Kg Maiz en grano;;5;15.000;10;0
+V-0096;06/jun;Ocasional;;CONTADO;;Finestrol;;1;25.000;10;0
+V-0097;06/jun;Ocasional;;CONTADO;;Cerdo terminador;;1;75.000;10;5000
+V-0098;06/jun;Ocasional;;CONTADO;;Ponedora 4 Kg;;1;20.000;10;0
+V-0099;06/jun;Ocasional;;CONTADO;;Pronto Cat granel;;1;5.000;10;0
+V-0100;06/jun;Ocasional;;CONTADO;;Aves crecimiento 3 Kg;;1;15.000;10;0
+V-0101;06/jun;Ocasional;;CONTADO;;Cerdo terminador;;1;80.000;10;5000
+V-0102;06/jun;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0103;06/jun;Ocasional;;CONTADO;;Kg Pronto Dog Adulto granel;;2;20.000;10;0
+V-0104;06/jun;Ocasional;;CONTADO;;Dectomax;;1;70.000;10;0
+V-0105;06/jun;Ocasional;;CONTADO;;Agujas;;5;5.000;10;0
+V-0106;06/jun;Ocasional;;CONTADO;;Jeringa 5 mL;;1;5.000;10;0
+V-0107;06/jun;Ocasional;;CONTADO;;Finestrol dosis;;1;20.000;10;0
+V-0108;06/jun;Ocasional;;CONTADO;;Ivermic 0,5 mL;;1;5.000;10;0
+V-0109;08/jun;Ocasional;;CONTADO;;Maíz Molido (kg);;5;3.500;10;0
+V-0110;08/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;2;35.000;10;0
+V-0111;08/jun;Ocasional;;CONTADO;;Lechera ;;3;70.000;10;3000
+V-0112;08/jun;Ocasional;;CONTADO;;Engorde ;;2;70.000;10;6000
+V-0113;08/jun;Ocasional;;CONTADO;;Vitabiot ;;1;10.000;10;5000
+V-0114;08/jun;Ocasional;;CONTADO;;Rifag;;1;30.000;10;0
+V-0115;08/jun;Ocasional;;CONTADO;;Aves crecimiento 25 kg ;;1;80.000;10;5000
+V-0116;08/jun;Ocasional;;CONTADO;;Gentavet Spray;;1;30.000;10;0
+V-0117;08/jun;Ocasional;;CONTADO;;Afoxopet 10-25 kg;;1;35.000;10;0
+V-0118;08/jun;Ocasional;;CONTADO;;Kertus Shampoo Neutro;;1;25.000;10;0
+V-0119;08/jun;Ocasional;;CONTADO;;Ponedora (kg);;4;5.000;10;0
+V-0120;08/jun;Ocasional;;CONTADO;;Nebulizador;;1;80.000;10;0
+V-0121;09/jun;Ocasional;;CONTADO;;Hepacura 20 kg;;1;25.000,00;10;0
+V-0122;09/jun;Ocasional;;CONTADO;;Floxacin 50 mg;;1;15.000,00;10;0
+V-0123;09/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;1;35.000,00;10;0
+V-0124;09/jun;Ocasional;;CONTADO;;Gaviplen gotas;;1;25.000,00;10;0
+V-0125;09/jun;Ocasional;;CONTADO;;Doxivet 100 mg;;1;25.000,00;10;0
+V-0126;09/jun;Ocasional;;CONTADO;;Ponedora;;1;95.000,00;10;0
+V-0127;09/jun;Ocasional;;CONTADO;;Ivet-Pets;;1;45.000,00;10;0
+V-0128;09/jun;Ocasional;;CONTADO;;VetCort;;1;35.000,00;10;0
+V-0129;09/jun;Ocasional;;CONTADO;;Ketomic;;1;25.000,00;10;0
+V-0130;09/jun;Ocasional;;CONTADO;;Ivet-Pets;;1;45.000,00;10;0
+V-0131;09/jun;Ocasional;;CONTADO;;Maíz en grano (kg);;16,5;3.030,30;10;0
+V-0132;09/jun;Ocasional;;CONTADO;;Equino;;1;150.000,00;10;0
+V-0133;09/jun;Ocasional;;CONTADO;;VetCort;;1;35.000,00;10;0
+V-0134;09/jun;Ocasional;;CONTADO;;Doxivet 200 mg;;1;30.000,00;10;0
+V-0135;09/jun;Ocasional;;CONTADO;;Floxacin de 150 mg;;1;25.000,00;10;0
+V-0136;09/jun;Ocasional;;CONTADO;;Dexagal 10 ml;;1;25.000,00;10;0
+V-0137;09/jun;Ocasional;;CONTADO;;Doxivet 100 mg;;1;25.000,00;10;0
+V-0138;09/jun;Ocasional;;CONTADO;;VetCort;;1;35.000,00;10;0
+V-0139;09/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000,00;10;0
+V-0140;10/jun;Ocasional;;CONTADO;;Comedero para gallina;;1;30.000;10;0
+V-0141;10/jun;Ocasional;;CONTADO;;Maíz en grano;;1;5.000;10;0
+V-0142;10/jun;Ocasional;;CONTADO;;Aves crecimiento granel 3 Kg;;1;15.000;10;0
+V-0143;10/jun;Ocasional;;CONTADO;;Pronto Cat Crecimiento adulto;;1;240.000;10;0
+V-0144;10/jun;Ocasional;;CONTADO;;Analgecin Pets;;1;30.000;10;0
+V-0145;10/jun;Ocasional;;CONTADO;;Rowatinex;;1;50.000;10;0
+V-0146;10/jun;Ocasional;;CONTADO;;Hepacura;;1;30.000;10;0
+V-0147;10/jun;Ocasional;;CONTADO;;Analgecin;;1;30.000;10;0
+V-0148;10/jun;Ocasional;;CONTADO;;Aves iniciador granel 3 Kg;;1;15.000;10;0
+V-0149;10/jun;Ocasional;;CONTADO;;Aves Crecimiento granel 3 Kg;;1;15.000;10;0
+V-0150;10/jun;Ocasional;;CONTADO;;Sal Supermix;;1;90.000;10;0
+V-0151;10/jun;Ocasional;;CONTADO;;Huesito;;5;1.000;10;0
+V-0152;10/jun;Ocasional;;CONTADO;;Aves iniciador granel 3 Kg;;1;15.000;10;0
+V-0153;10/jun;Ocasional;;CONTADO;;Girasol;;1;15.000;10;0
+V-0154;11/jun;Ocasional;;CONTADO;;Terramicina en Polvo;;1;65.000;10;0
+V-0155;11/jun;Ocasional;;CONTADO;;Aves crecimiento 25 kg;;1;85.000;10;0
+V-0156;11/jun;Ocasional;;CONTADO;;Vacuna septuple;;1;50.000;10;0
+V-0157;11/jun;Ocasional;;CONTADO;;Pronto Dog Adulto granel 1 kg;;1;10.000;10;0
+V-0158;11/jun;Ocasional;;CONTADO;;Finestrel Dosis;;1;20.000;10;0
+V-0159;11/jun;Ocasional;;CONTADO;;Vacuna Antirrábica;;1;30.000;10;0
+V-0160;11/jun;Ocasional;;CONTADO;;Septuple vacuna;;1;50.000;10;0
+V-0161;11/jun;Ocasional;;CONTADO;;Afrecho;;1;60.000;10;0
+V-0162;11/jun;Ocasional;;CONTADO;;Maíz Molido 48 kg;;1;140.000;10;0
+V-0163;11/jun;Ocasional;;CONTADO;;Sal supermix;;1;90.000;10;0
+V-0164;11/jun;Ocasional;;CONTADO;;Aves crecimiento granel 2 kg;;1;10.000;10;0
+V-0165;11/jun;Ocasional;;CONTADO;;Vacuna Septuple;;3;50.000;10;0
+V-0166;11/jun;Ocasional;;CONTADO;;Vetcort;;1;35.000;10;0
+V-0167;11/jun;Ocasional;;CONTADO;;Afoxocan 4-10;;3;25.000;10;0
+V-0168;11/jun;Ocasional;;CONTADO;;Hepacura;;1;25.000;10;0
+V-0169;11/jun;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0170;12/jun;Ocasional;;CONTADO;;Lechera ;;1;73.000;10;Descuento
+V-0171;12/jun;Ocasional;;CONTADO;;Engorde ;;2;73.000;10;Descuento
+V-0172;12/jun;Ocasional;;CONTADO;;Aves crecimiento 25 kg;;1;73.000;10;0
+V-0173;12/jun;Ocasional;;CONTADO;;Nebulizador;;1;80.000;10;0
+V-0174;12/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0175;12/jun;Ocasional;;CONTADO;;Paté Cat Chow Adulto Pescado;;3;8.000;10;0
+V-0176;12/jun;Ocasional;;CONTADO;;Paté Cat Chow gatitos;;2;8.000;10;0
+V-0177;12/jun;Ocasional;;CONTADO;;Pronto Dog Cachorro 1.5 kg;;1;25.000;10;0
+V-0178;12/jun;Ocasional;;CONTADO;;Septuple;;1;50.000;10;0
+V-0179;12/jun;Ocasional;;CONTADO;;Paté Dog Chow filhotes;;1;8.000;10;0
+V-0180;12/jun;Ocasional;;CONTADO;;Arena Star Pop;;1;30.000;10;0
+V-0181;12/jun;Ocasional;;CONTADO;;Lechera;;1;73.000;10;0
+V-0182;12/jun;Ocasional;;CONTADO;;Engorde;;1;73.000;10;0
+V-0183;12/jun;Ocasional;;CONTADO;;Septuple;;1;50.000;10;0
+V-0184;12/jun;Ocasional;;CONTADO;;Finestrol;;1;25.000;10;0
+V-0185;12/jun;Ocasional;;CONTADO;;Pronto cat castrado 2.7;;1;75.000;10;0
+V-0186;12/jun;Ocasional;;CONTADO;;Afrecho;;1;60.000;10;0
+V-0187;13/jun;Ocasional;;CONTADO;;Biomisol;;1;15.000;10;0
+V-0188;13/jun;Ocasional;;CONTADO;;Pronto Dog Cachorro 1.5 kg;;1;25.000;10;0
+V-0189;13/jun;Ocasional;;CONTADO;;Dosis de Ivermic;;3;10.000;10;0
+V-0190;13/jun;Ocasional;;CONTADO;;Pomada iodurada;;1;35.000;10;0
+V-0191;13/jun;Ocasional;;CONTADO;;Aves Crecimiento 2 kg;;1;10.000;10;0
+V-0192;13/jun;Ocasional;;CONTADO;;Engorde ;;2;73.000;10;Descuento
+V-0193;13/jun;Ocasional;;CONTADO;;Doxivet 50 mg;;1;25.000;10;0
+V-0194;13/jun;Ocasional;;CONTADO;;Doxivet 200 mg;;1;30.000;10;0
+V-0195;13/jun;Ocasional;;CONTADO;;Analgecin;;1;30.000;10;0
+V-0196;13/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0197;13/jun;Ocasional;;CONTADO;;Engorde ;;1;73.000;10;DESCUENTO
+V-0198;13/jun;Ocasional;;CONTADO;;Lechera ;;1;73.000;10;DESCUENTO
+V-0199;13/jun;Ocasional;;CONTADO;;Engorde ;;1;73.000;10;DESCUENTO
+V-0200;13/jun;Ocasional;;CONTADO;;Maíz en grano 3 kg;;1;10.000;10;0
+V-0201;13/jun;Ocasional;;CONTADO;;Septuple;;1;50.000;10;0
+V-0202;13/jun;Ocasional;;CONTADO;;Vetcor;;1;35.000;10;0
+V-0203;15/jun;Ocasional;;CONTADO;;Aves Terminador 5 kg;;1;25.000;10;0
+V-0204;15/jun;Ocasional;;CONTADO;;Aves Ponedora 25 kg;;1;95.000;10;0
+V-0205;15/jun;Ocasional;;CONTADO;;Extracto de higado;;1;35.000;10;0
+V-0206;15/jun;Ocasional;;CONTADO;;L. Biomisol;;1;25.000;10;0
+V-0207;15/jun;Ocasional;;CONTADO;;Pronto Dog cachorro 2.7;;1;35.000;10;0
+V-0208;15/jun;Ocasional;;CONTADO;;Canex;;4;12.500;10;0
+V-0209;15/jun;Ocasional;;CONTADO;;Afoxopet 4-10;;1;25.000;10;0
+V-0210;15/jun;Ocasional;;CONTADO;;Biomisol;;1;15.000;10;0
+V-0211;15/jun;Ocasional;;CONTADO;;Multivitamin;;1;35.000;10;0
+V-0212;15/jun;Ocasional;;CONTADO;;Afoxocan 10-25 kg;;1;35.000;10;0
+V-0213;15/jun;Ocasional;;CONTADO;;Ketomic;;1;25.000;10;0
+V-0214;15/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0215;15/jun;Ocasional;;CONTADO;;Equino;;1;150.000;10;0
+V-0216;15/jun;Ocasional;;CONTADO;;Afrecho;;1;60.000;10;0
+V-0217;15/jun;Ocasional;;CONTADO;;Pronto cat granel 2 kg;;1;10.000;10;0
+V-0218;15/jun;Ocasional;;CONTADO;;Cepillo con pasta dental;;1;25.000;10;0
+V-0219;15/jun;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0220;15/jun;Ocasional;;CONTADO;;Vacuna triple felina;;1;50.000;10;0
+V-0221;16/jun;Ocasional;;CONTADO;;Engorde ;;1;73.000;10;Descuento
+V-0222;16/jun;Ocasional;;CONTADO;;Lechera;;4;73.000;10;Descuento
+V-0223;16/jun;Ocasional;;CONTADO;;Afrecho;;2;55.000;10;0
+V-0224;16/jun;Ocasional;;CONTADO;;Sal supermix;;1;90.000;10;0
+V-0225;16/jun;Ocasional;;CONTADO;;Doxivet 100mg;;1;25.000;10;0
+V-0226;16/jun;Ocasional;;CONTADO;;Hepacura;;1;25.000;10;0
+V-0227;16/jun;Ocasional;;CONTADO;;Ivet-Pets Cmp;;1;43.000;10;0
+V-0228;16/jun;Ocasional;;CONTADO;;Gentavet spray;;1;30.000;10;0
+V-0229;16/jun;Ocasional;;CONTADO;;Arena Bionature;;1;45.000;10;0
+V-0230;16/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000;10;0
+V-0231;16/jun;Ocasional;;CONTADO;;Biomisol;;1;15.000;10;0
+V-0232;16/jun;Ocasional;;CONTADO;;Pronto Dog cachorro de 2.7;;1;35.000;10;0
+V-0233;16/jun;Ocasional;;CONTADO;;Vetcord;;1;35.000;10;0
+V-0234;16/jun;Ocasional;;CONTADO;;Soludex;;1;20.000;10;0
+V-0235;17/jun;Ocasional;;CONTADO;;Terramicina;;1;65.000;10;0
+V-0236;17/jun;Ocasional;;CONTADO;;Doxivet 200;;1;30.000;10;0
+V-0237;17/jun;Ocasional;;CONTADO;;Gaviplen;;1;25.000;10;0
+V-0238;17/jun;Ocasional;;CONTADO;;Pipeta Clazic;;1;30.000;10;0
+V-0239;17/jun;Ocasional;;CONTADO;;Afoxocan 4-10;;1;25.000;10;0
+V-0240;17/jun;Ocasional;;CONTADO;;Afoxocan 2-4;;1;20.000;10;0
+V-0241;17/jun;Ocasional;;CONTADO;;Servicio de corte de uña;;1;20.000;10;0
+V-0242;17/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;1;35.000;10;0
+V-0243;17/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000;10;0
+V-0244;17/jun;Ocasional;;CONTADO;;Biberon;;1;25.000;10;0
+V-0245;17/jun;Ocasional;;CONTADO;;Doxi 100 mg;;1;25.000;10;0
+V-0246;17/jun;Ocasional;;CONTADO;;Doxivet 200 x 10;;2;30.000;10;0
+V-0247;17/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000;10;0
+V-0248;17/jun;Ocasional;;CONTADO;;Terminador Aves;;1;85.000;10;0
+V-0249;18/jun;Ocasional;;CONTADO;;Bolsa afrecho;;1;55.000;10;0
+V-0250;18/jun;Ocasional;;CONTADO;;Vacuna;;1;50.000;10;0
+V-0251;18/jun;Ocasional;;CONTADO;;Afoxocan 4-10;;1;25.000;10;0
+V-0252;18/jun;Ocasional;;CONTADO;;Canex 1;;2;15.000;10;0
+V-0253;18/jun;Ocasional;;CONTADO;;Ración para conejo;;1;10.000;10;0
+V-0254;18/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;1;35.000;10;0
+V-0255;18/jun;Ocasional;;CONTADO;;Afoxocan 10-25;;1;35.000;10;0
+V-0256;18/jun;Ocasional;;CONTADO;;Afoxocan 4-10;;1;25.000;10;0
+V-0257;18/jun;Ocasional;;CONTADO;;Biomisol;;1;15.000;10;0
+V-0258;18/jun;Ocasional;;CONTADO;;Ferrol B12;;1;30.000;10;0
+V-0259;18/jun;Ocasional;;CONTADO;;Doxivet 20mg;;1;30.000;10;0
+V-0260;19/jun;Ocasional;;CONTADO;;Sobre Vitabiot fte;;1;10.000;10;0
+V-0261;19/jun;Ocasional;;CONTADO;;Maíz Molido (kg);;22;3.500;10;0
+V-0262;19/jun;Ocasional;;CONTADO;;Floxacin 50mg;;1;15.000;10;0
