@@ -15,8 +15,13 @@ export default function Login() {
     e.preventDefault()
     setError(''); setLoading(true)
     try {
-      await login(form.usuario, form.password)
-      navigate('/')
+      const u = await login(form.usuario, form.password)
+      const isOperador = ['CAJERO_1', 'CAJERO_2', 'CAJERO', 'OPERADOR'].includes(u?.perfil)
+      if (isOperador) {
+        navigate('/operador')
+      } else {
+        navigate('/')
+      }
     } catch (err) {
       setError(err.message)
     } finally { setLoading(false) }

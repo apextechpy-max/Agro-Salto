@@ -22,9 +22,8 @@ const VET_ITEMS = [
   { to: '/veterinaria/clinica', icon: '🏥', label: 'Clínica' },
 ]
 
-
 export default function Layout() {
-  const { user, logout, isAdmin } = useAuth()
+  const { user, logout, isAdmin, setModoInterfaz } = useAuth()
   const navigate = useNavigate()
   const [alertas, setAlertas] = useState(0)
 
@@ -48,6 +47,34 @@ export default function Layout() {
             <div className="logo-sub" style={{ fontSize: 10, opacity: 0.7 }}>Consultorio Veterinario</div>
           </div>
         </div>
+
+        {/* Botón rápido a Modo Móvil Simplificado */}
+        <div style={{ padding: '0 12px 10px 12px' }}>
+          <button
+            onClick={() => {
+              setModoInterfaz('SIMPLE')
+              navigate('/operador')
+            }}
+            style={{
+              width: '100%',
+              background: 'rgba(77, 182, 135, 0.15)',
+              color: '#6ed1a7',
+              border: '1px solid #4db687',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              fontSize: '12px',
+              fontWeight: '800',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}
+          >
+            📱 Modo App Simplificado
+          </button>
+        </div>
+
         <nav className="sidebar-nav">
           <div className="nav-section-title">Menú Principal</div>
           {filteredNav.map(item => (

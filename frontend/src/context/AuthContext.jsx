@@ -12,8 +12,9 @@ function tokenEsValido(token) {
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [modoPreferido, setModoPreferidoState] = useState(() => {
+    return localStorage.getItem('modo_interfaz') || null
+  })
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -45,15 +46,46 @@ export function AuthProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    localStorage.removeItem('modo_interfaz')
     setUser(null)
+    setModoPreferidoState(null)
+  }
+
+  const setModoInterfaz = (modo) => {
+    localStorage.setItem('modo_interfaz', modo)
+    setModoPreferidoState(modo)
   }
 
   const isAdmin = () => user?.perfil === 'ADMIN'
   const canManageStock = () => ['ADMIN', 'DEPOSITO'].includes(user?.perfil)
-  const canSell = () => ['ADMIN', 'CAJERO_1', 'CAJERO_2'].includes(user?.perfil)
+  const canSell = () => ['ADMIN', 'CAJERO_1', 'CAJERO_2', 'OPERADOR'].includes(user?.perfil)
+
+  // Determina si se debe mostrar el modo simplificado (4 botones)
+  const isSimpleMode = () => {
+    if (modoPreferido === 'SIMPLE') return true
+    if (modoPreferido === 'COMPLETO') return false
+    // Por defecto, perfiles de caja/operador usan modo simple
+    return ['CAJERO_1', 'CAJERO_2', 'CAJERO', 'OPERADOR'].includes(user?.perfil)
+  }
+
+  const getHomePath = () => {
+    return isSimpleMode() ? '/operador' : '/'
+  }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, isAdmin, canManageStock, canSell }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      loading,
+      isAdmin,
+      canManageStock,
+      canSell,
+      modoPreferido,
+      setModoInterfaz,
+      isSimpleMode,
+      getHomePath
+    }}>
       {children}
     </AuthContext.Provider>
   )
