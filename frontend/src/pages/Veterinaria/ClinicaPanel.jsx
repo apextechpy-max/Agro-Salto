@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import api from '../../api'
 import logoImg from '../../assets/medallon_final.png'
+import { getImageUrl } from '../../utils/image'
 
 const TIPO_ICONS = { CONSULTA: '🩺', CIRUGIA: '🔬', VACUNA: '💉', BANO_ESTETICA: '🛁', CONTROL: '📋', EMERGENCIA: '🚨', OTRO: '📝' }
 
@@ -471,7 +472,7 @@ export default function ClinicaPanel() {
                           <div key={e.id} className="card" style={{ padding: 8, fontSize: 11 }}>
                             <div>📅 {new Date(e.consulta_fecha).toLocaleDateString()}</div>
                             <strong>{e.descripcion}</strong>
-                            <a href={`/uploads/${e.url}`} target="_blank" className="btn btn-sm btn-ghost" style={{ marginTop: 4, width: '100%' }}>Ver PDF</a>
+                            <a href={getImageUrl(e.url) || '#'} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost" style={{ marginTop: 4, width: '100%' }}>Ver Archivo</a>
                           </div>
                         ))}
                       </div>
@@ -551,7 +552,7 @@ export default function ClinicaPanel() {
                         {selectedConsulta.estudios.map(est => (
                           <div key={est.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 12, background: 'var(--bg-card)', padding: '6px 10px', borderRadius: 4 }}>
                             <span>📄 {est.descripcion || est.nombre}</span>
-                            <a href={`/uploads/${est.url_path}`} target="_blank" className="btn btn-sm btn-ghost" style={{ fontSize: 10 }}>Ver</a>
+                            <a href={getImageUrl(est.url_path) || '#'} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost" style={{ fontSize: 10 }}>Ver</a>
                           </div>
                         ))}
                       </div>

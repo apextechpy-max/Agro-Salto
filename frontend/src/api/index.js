@@ -1,4 +1,4 @@
-const BASE = '/_/backend/api'
+const BASE = '/api'
 
 function getToken() { return localStorage.getItem('token') }
 
@@ -123,7 +123,7 @@ export const api = {
   getProgreso: (id) => req('GET', `/clinica/consultas/${id}/progreso`),
   consultaPreVenta: (id, d) => req('POST', `/clinica/consultas/${id}/pre-venta`, d),
   subirEstudio: (consulta_id, formData) => {
-    return fetch(`/_/backend/api/clinica/consultas/${consulta_id}/estudio`, {
+    return fetch(`${BASE}/clinica/consultas/${consulta_id}/estudio`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${getToken()}` },
       body: formData

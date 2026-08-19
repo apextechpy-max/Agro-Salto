@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import api from '../api'
+import { getImageUrl } from '../utils/image'
 
 const fmt = (n) => new Intl.NumberFormat('es-PY').format(Math.round(n || 0))
 
@@ -210,10 +211,32 @@ export default function Productos() {
             {productos.map(p => (
               <tr key={p.id}>
                 <td style={{ width: 48 }}>
-                  {p.foto_url
-                    ? <img src={p.foto_url} alt={p.nombre} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }} />
-                    : <div style={{ width: 40, height: 40, borderRadius: 6, background: 'var(--bg-card)', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>🌿</div>
-                  }
+                  {p.foto_url && getImageUrl(p.foto_url) ? (
+                    <img
+                      src={getImageUrl(p.foto_url)}
+                      alt={p.nombre}
+                      style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 6, border: '1px solid var(--border)' }}
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        if (e.target.nextElementSibling) e.target.nextElementSibling.style.display = 'flex';
+                      }}
+                    />
+                  ) : null}
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 6,
+                      background: 'var(--bg-card)',
+                      border: '1px solid var(--border)',
+                      display: (p.foto_url && getImageUrl(p.foto_url)) ? 'none' : 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 18
+                    }}
+                  >
+                    🌿
+                  </div>
                 </td>
                 <td style={{ color: 'var(--text-muted)', fontSize: 12 }}>{p.codigo}</td>
                 <td style={{ fontWeight: 500 }}>{p.nombre}</td>
