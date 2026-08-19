@@ -10,7 +10,7 @@
       "mount": "/_/backend"
     },
     "api": {
-      "entrypoint": "api",
+      "entrypoint": "api/index.js",
       "mount": "/api"
     }
   }
