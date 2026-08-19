@@ -68,6 +68,35 @@ export default function DashboardOperador() {
     navigate(ruta)
   }
 
+  // Modal de Cierre de Caja
+  const [mostrarModalCierre, setMostrarModalCierre] = useState(false)
+  const [montoCierreEfectivo, setMontoCierreEfectivo] = useState('')
+  const [cerrandoCaja, setCerrandoCaja] = useState(false)
+  const [errorCierre, setErrorCierre] = useState('')
+
+  const handleConfirmarCierre = async (e) => {
+    e.preventDefault()
+    if (!cajaEstado.data?.id) return
+    const montoNum = Number(String(montoCierreEfectivo).replace(/\D/g, '')) || 0
+    setCerrandoCaja(true)
+    setErrorCierre('')
+
+    try {
+      await api.cerrarCaja({
+        apertura_id: cajaEstado.data.id,
+        monto_declarado: montoNum
+      })
+
+      await verificarCaja()
+      setMostrarModalCierre(false)
+      setMontoCierreEfectivo('')
+    } catch (err) {
+      setErrorCierre(err.message || 'Error al cerrar la caja')
+    } finally {
+      setCerrandoCaja(false)
+    }
+  }
+
   const sumarMontoRapido = (valor) => {
     const act = Number(montoInicial.replace(/\D/g, '')) || 0
     const nuevo = act + valor
@@ -178,7 +207,13 @@ export default function DashboardOperador() {
         {/* Banner Estado de Caja */}
         <div 
           onClick={() => {
-            if (!cajaEstado.abierta) setMostrarModalApertura(true)
+            if (!cajaEstado.abierta) {
+              setMostrarModalApertura(true)
+            } else {
+              setMontoCierreEfectivo('')
+              setErrorCierre('')
+              setMostrarModalCierre(true)
+            }
           }}
           style={{
             background: cajaEstado.abierta ? 'rgba(77, 182, 135, 0.12)' : 'rgba(255, 107, 107, 0.16)',
@@ -188,7 +223,7 @@ export default function DashboardOperador() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            cursor: cajaEstado.abierta ? 'default' : 'pointer'
+            cursor: 'pointer'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -199,12 +234,34 @@ export default function DashboardOperador() {
               </div>
               <div style={{ fontSize: '12px', color: '#9ba1a2', marginTop: '2px' }}>
                 {cajaEstado.abierta 
-                  ? `Monto Inicial: ₲ ${Number(cajaEstado.data?.monto_inicial || 0).toLocaleString('es-PY')}` 
+                  ? `Monto Inicial: ₲ ${Number(cajaEstado.data?.monto_inicial || 0).toLocaleString('es-PY')} • Toca para Cerrar Caja` 
                   : '⚠️ Es obligatorio abrir caja antes de realizar operaciones'}
               </div>
             </div>
           </div>
-          {!cajaEstado.abierta && (
+          {cajaEstado.abierta ? (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setMontoCierreEfectivo('')
+                setErrorCierre('')
+                setMostrarModalCierre(true)
+              }}
+              style={{
+                background: '#3d1e24',
+                color: '#ff9ebb',
+                border: '1px solid #9e3646',
+                borderRadius: '8px',
+                padding: '6px 10px',
+                fontSize: '11px',
+                fontWeight: '800',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              🔒 Cerrar
+            </button>
+          ) : (
             <span style={{ fontSize: '18px', color: '#ff8787' }}>➔</span>
           )}
         </div>
@@ -308,7 +365,7 @@ export default function DashboardOperador() {
             </div>
           </button>
 
-          {/* BOTÓN 3: CLIENTES */}
+          {/* BOTÓN 3: CLIENTES Y PROVEEDORES */}
           <button
             onClick={() => manejarNavegacion('/operador/clientes')}
             style={{
@@ -340,11 +397,11 @@ export default function DashboardOperador() {
               👥
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '20px', fontWeight: '900', color: '#90caf9', letterSpacing: '-0.3px' }}>
-                CLIENTES
+              <div style={{ fontSize: '17px', fontWeight: '900', color: '#90caf9', letterSpacing: '-0.3px', lineHeight: '1.2' }}>
+                CLIENTES Y PROVEEDORES
               </div>
-              <div style={{ fontSize: '12px', color: '#bbdefb', marginTop: '2px', fontWeight: '500' }}>
-                Buscar / Nuevo
+              <div style={{ fontSize: '12px', color: '#bbdefb', marginTop: '4px', fontWeight: '500' }}>
+                Buscar / Directorio
               </div>
             </div>
           </button>
@@ -667,6 +724,142 @@ export default function DashboardOperador() {
                 }}
               >
                 {abriendoCaja ? 'Abriendo Caja...' : '🔓 Confirmar Apertura e Iniciar Turno'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CIERRE DE CAJA */}
+      {mostrarModalCierre && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: '#1a1f22',
+            border: '2px solid #9e3646',
+            borderRadius: '24px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '440px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '24px' }}>🔒</span>
+                <div>
+                  <h3 style={{ margin: 0, color: '#ff9ebb', fontSize: '18px', fontWeight: '800' }}>
+                    Cerrar Turno de Caja
+                  </h3>
+                  <div style={{ fontSize: '12px', color: '#9ba1a2' }}>
+                    {cajaEstado.data?.caja_nombre || 'Caja Principal'}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setMostrarModalCierre(false)}
+                style={{ background: '#283438', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {errorCierre && (
+              <div style={{
+                background: 'rgba(255, 107, 107, 0.15)',
+                border: '1px solid #ff6b6b',
+                color: '#ff8787',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                marginBottom: '16px',
+                textAlign: 'center',
+                fontWeight: '600'
+              }}>
+                ⚠️ {errorCierre}
+              </div>
+            )}
+
+            <div style={{
+              background: '#121719',
+              borderRadius: '14px',
+              padding: '14px',
+              marginBottom: '16px',
+              border: '1px solid #283438',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <span style={{ fontSize: '13px', color: '#9ba1a2' }}>Monto de Apertura:</span>
+              <strong style={{ fontSize: '15px', color: '#73e6b2' }}>
+                ₲ {Number(cajaEstado.data?.monto_inicial || 0).toLocaleString('es-PY')}
+              </strong>
+            </div>
+
+            <form onSubmit={handleConfirmarCierre} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#ffc2d2', marginBottom: '8px' }}>
+                  💵 Efectivo Real en Caja al Cierre (₲) *
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={montoCierreEfectivo}
+                  onChange={(e) => {
+                    const num = Number(e.target.value.replace(/\D/g, '')) || 0
+                    setMontoCierreEfectivo(num ? num.toLocaleString('es-PY') : '')
+                  }}
+                  placeholder="0"
+                  style={{
+                    width: '100%',
+                    background: '#0d1214',
+                    border: '2px solid #9e3646',
+                    borderRadius: '12px',
+                    padding: '14px',
+                    color: '#ff9ebb',
+                    fontSize: '22px',
+                    fontWeight: '900',
+                    textAlign: 'right',
+                    boxSizing: 'border-box'
+                  }}
+                  required
+                />
+                <div style={{ fontSize: '11px', color: '#9ba1a2', marginTop: '6px' }}>
+                  Cuenta todo el dinero físico en billetes y monedas que tienes en la caja.
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={cerrandoCaja}
+                style={{
+                  background: 'linear-gradient(135deg, #9e3646, #c92a2a)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '14px',
+                  padding: '16px',
+                  fontSize: '16px',
+                  fontWeight: '800',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(158, 54, 70, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '6px'
+                }}
+              >
+                {cerrandoCaja ? 'Cerrando Caja...' : '🔒 Confirmar y Cerrar Caja'}
               </button>
             </form>
           </div>

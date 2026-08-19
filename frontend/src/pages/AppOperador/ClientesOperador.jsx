@@ -6,11 +6,12 @@ export default function ClientesOperador() {
   const navigate = useNavigate()
 
   const [busqueda, setBusqueda] = useState('')
-  const [clientes, setClientes] = useState([])
+  const [filtroTipo, setFiltroTipo] = useState('TODOS') // 'TODOS' | 'CLIENTE' | 'PROVEEDOR'
+  const [personas, setPersonas] = useState([])
   const [loading, setLoading] = useState(false)
   const [mostrarModalNuevo, setMostrarModalNuevo] = useState(false)
 
-  // Formulario Nuevo Cliente
+  // Formulario Nuevo Cliente / Proveedor
   const [nuevo, setNuevo] = useState({
     nombre: '',
     documento: '',
@@ -22,15 +23,15 @@ export default function ClientesOperador() {
   const [errorModal, setErrorModal] = useState('')
 
   useEffect(() => {
-    fetchClientes('')
+    fetchPersonas('')
   }, [])
 
-  const fetchClientes = async (q) => {
+  const fetchPersonas = async (q) => {
     setLoading(true)
     try {
-      const data = await api.personas(`?tipo=CLIENTE${q ? `&q=${encodeURIComponent(q)}` : ''}`)
+      const data = await api.personas(q ? `?q=${encodeURIComponent(q)}` : '')
       const list = Array.isArray(data) ? data : (data.personas || [])
-      setClientes(list)
+      setPersonas(list)
     } catch (err) {
       console.error(err)
     } finally {
@@ -41,13 +42,13 @@ export default function ClientesOperador() {
   const handleBuscar = (e) => {
     const txt = e.target.value
     setBusqueda(txt)
-    fetchClientes(txt)
+    fetchPersonas(txt)
   }
 
-  const handleCrearCliente = async (e) => {
+  const handleCrearPersona = async (e) => {
     e.preventDefault()
     if (!nuevo.nombre.trim()) {
-      setErrorModal('Ingresa el nombre del cliente')
+      setErrorModal('Ingresa el nombre o razón social')
       return
     }
     setGuardando(true)
@@ -56,18 +57,28 @@ export default function ClientesOperador() {
     try {
       await api.createPersona({
         ...nuevo,
-        razon_social: nuevo.nombre,
-        tipo_persona: 'CLIENTE'
+        razon_social: nuevo.nombre.trim().toUpperCase(),
+        nombre: nuevo.nombre.trim().toUpperCase(),
+        ruc: nuevo.documento.trim(),
+        tipo_persona: nuevo.tipo_persona
       })
       setMostrarModalNuevo(false)
       setNuevo({ nombre: '', documento: '', telefono: '', direccion: '', tipo_persona: 'CLIENTE' })
-      fetchClientes(busqueda)
+      fetchPersonas(busqueda)
     } catch (err) {
-      setErrorModal(err.message || 'Error al guardar cliente')
+      setErrorModal(err.message || 'Error al guardar')
     } finally {
       setGuardando(false)
     }
   }
+
+  // Filtrado local por pestaña
+  const personasFiltradas = personas.filter(p => {
+    const tipo = (p.tipo_persona || p.tipo || 'CLIENTE').toUpperCase()
+    if (filtroTipo === 'CLIENTE') return tipo === 'CLIENTE'
+    if (filtroTipo === 'PROVEEDOR') return tipo === 'PROVEEDOR'
+    return true
+  })
 
   return (
     <div style={{
@@ -108,13 +119,16 @@ export default function ClientesOperador() {
         >
           ← Volver
         </button>
-        <div style={{ fontWeight: '900', fontSize: '17px', color: '#90caf9' }}>
-          👥 CLIENTES
+        <div style={{ fontWeight: '900', fontSize: '16px', color: '#90caf9' }}>
+          👥 CLIENTES Y PROVEEDORES
         </div>
         <button
-          onClick={() => setMostrarModalNuevo(true)}
+          onClick={() => {
+            setErrorModal('')
+            setMostrarModalNuevo(true)
+          }}
           style={{
-            background: '#336699',
+            background: 'linear-gradient(135deg, #336699, #4a90e2)',
             color: '#fff',
             border: 'none',
             borderRadius: '10px',
@@ -130,6 +144,55 @@ export default function ClientesOperador() {
 
       {/* Main Area */}
       <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+        {/* Pestañas de filtro */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+          <button
+            onClick={() => setFiltroTipo('TODOS')}
+            style={{
+              padding: '10px 6px',
+              borderRadius: '10px',
+              border: filtroTipo === 'TODOS' ? '2px solid #90caf9' : '1px solid #283438',
+              background: filtroTipo === 'TODOS' ? '#1d2b38' : '#1a2225',
+              color: filtroTipo === 'TODOS' ? '#90caf9' : '#9ba1a2',
+              fontWeight: '800',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+          >
+            Todos ({personas.length})
+          </button>
+          <button
+            onClick={() => setFiltroTipo('CLIENTE')}
+            style={{
+              padding: '10px 6px',
+              borderRadius: '10px',
+              border: filtroTipo === 'CLIENTE' ? '2px solid #336699' : '1px solid #283438',
+              background: filtroTipo === 'CLIENTE' ? '#1b2d3d' : '#1a2225',
+              color: filtroTipo === 'CLIENTE' ? '#bbdefb' : '#9ba1a2',
+              fontWeight: '800',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+          >
+            👤 Clientes
+          </button>
+          <button
+            onClick={() => setFiltroTipo('PROVEEDOR')}
+            style={{
+              padding: '10px 6px',
+              borderRadius: '10px',
+              border: filtroTipo === 'PROVEEDOR' ? '2px solid #d4af37' : '1px solid #283438',
+              background: filtroTipo === 'PROVEEDOR' ? '#332b18' : '#1a2225',
+              color: filtroTipo === 'PROVEEDOR' ? '#ffe082' : '#9ba1a2',
+              fontWeight: '800',
+              fontSize: '13px',
+              cursor: 'pointer'
+            }}
+          >
+            🚚 Proveedores
+          </button>
+        </div>
 
         {/* Buscador */}
         <div>
@@ -152,66 +215,84 @@ export default function ClientesOperador() {
           />
         </div>
 
-        {/* Lista de Clientes */}
+        {/* Lista de Clientes y Proveedores */}
         <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', color: '#9ba1a2', padding: '30px' }}>Cargando clientes...</div>
-          ) : clientes.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#9ba1a2', padding: '30px' }}>No se encontraron clientes</div>
+            <div style={{ textAlign: 'center', color: '#9ba1a2', padding: '30px' }}>Cargando registros...</div>
+          ) : personasFiltradas.length === 0 ? (
+            <div style={{ textAlign: 'center', color: '#9ba1a2', padding: '30px' }}>No se encontraron registros</div>
           ) : (
-            clientes.map(c => (
-              <div
-                key={c.id}
-                style={{
-                  background: '#1b2326',
-                  border: '1px solid #283438',
-                  borderRadius: '14px',
-                  padding: '14px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between'
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: '800', color: '#ffffff' }}>
-                    {c.nombre || c.razon_social}
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#90caf9', marginTop: '2px' }}>
-                    📄 {c.documento || c.ruc_ci || 'Sin Doc'}
-                  </div>
-                  {c.telefono && (
-                    <div style={{ fontSize: '12px', color: '#9ba1a2', marginTop: '2px' }}>
-                      📞 {c.telefono}
+            personasFiltradas.map(p => {
+              const esProveedor = (p.tipo_persona || p.tipo || '').toUpperCase() === 'PROVEEDOR'
+              return (
+                <div
+                  key={p.id}
+                  style={{
+                    background: '#1b2326',
+                    border: `1px solid ${esProveedor ? '#4a3b1a' : '#283438'}`,
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '8px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                      <div style={{ fontSize: '16px', fontWeight: '800', color: '#ffffff' }}>
+                        {p.nombre || p.razon_social}
+                      </div>
+                      <div style={{ fontSize: '12px', color: esProveedor ? '#ffe082' : '#90caf9', marginTop: '2px' }}>
+                        📄 {p.documento || p.ruc_ci || p.ruc || 'Sin Documento'}
+                      </div>
                     </div>
-                  )}
-                </div>
 
-                {c.telefono && (
-                  <a
-                    href={`https://wa.me/${c.telefono.replace(/[^0-9]/g, '')}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      background: '#1f382b',
-                      color: '#6ed1a7',
-                      border: '1px solid #2e7d58',
-                      borderRadius: '10px',
-                      padding: '8px 12px',
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      textDecoration: 'none'
-                    }}
-                  >
-                    💬 WhatsApp
-                  </a>
-                )}
-              </div>
-            ))
+                    <div style={{
+                      background: esProveedor ? '#332b18' : '#1d2b38',
+                      border: `1px solid ${esProveedor ? '#997a29' : '#336699'}`,
+                      color: esProveedor ? '#ffe082' : '#90caf9',
+                      padding: '4px 8px',
+                      borderRadius: '8px',
+                      fontSize: '11px',
+                      fontWeight: '800'
+                    }}>
+                      {esProveedor ? '🚚 PROVEEDOR' : '👤 CLIENTE'}
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', paddingTop: '6px', borderTop: '1px dashed #283438' }}>
+                    <div style={{ fontSize: '12px', color: '#9ba1a2' }}>
+                      {p.telefono ? `📞 ${p.telefono}` : (p.direccion || 'Sin contacto')}
+                    </div>
+
+                    {p.telefono && (
+                      <a
+                        href={`https://wa.me/${p.telefono.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          background: '#1f382b',
+                          color: '#6ed1a7',
+                          border: '1px solid #2e7d58',
+                          borderRadius: '8px',
+                          padding: '6px 10px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        💬 WhatsApp
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )
+            })
           )}
         </div>
       </div>
 
-      {/* Modal Agregar Nuevo Cliente */}
+      {/* Modal Agregar Nuevo Cliente o Proveedor */}
       {mostrarModalNuevo && (
         <div style={{
           position: 'fixed',
@@ -229,10 +310,14 @@ export default function ClientesOperador() {
             borderRadius: '20px',
             padding: '24px',
             width: '100%',
-            maxWidth: '420px'
+            maxWidth: '420px',
+            maxHeight: '90vh',
+            overflowY: 'auto'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: '#90caf9', fontSize: '18px' }}>👤 Registrar Nuevo Cliente</h3>
+              <h3 style={{ margin: 0, color: '#90caf9', fontSize: '18px' }}>
+                {nuevo.tipo_persona === 'PROVEEDOR' ? '🚚 Registrar Proveedor' : '👤 Registrar Cliente'}
+              </h3>
               <button
                 onClick={() => setMostrarModalNuevo(false)}
                 style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer' }}
@@ -247,14 +332,56 @@ export default function ClientesOperador() {
               </div>
             )}
 
-            <form onSubmit={handleCrearCliente} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <form onSubmit={handleCrearPersona} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              
+              {/* Selector de Tipo: Cliente vs Proveedor */}
+              <div>
+                <label style={{ fontSize: '12px', color: '#cbd5e1', display: 'block', marginBottom: '6px', fontWeight: '700' }}>
+                  Tipo de Registro *
+                </label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setNuevo(n => ({ ...n, tipo_persona: 'CLIENTE' }))}
+                    style={{
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: nuevo.tipo_persona === 'CLIENTE' ? '2px solid #336699' : '1px solid #283438',
+                      background: nuevo.tipo_persona === 'CLIENTE' ? '#1d2b38' : '#121719',
+                      color: nuevo.tipo_persona === 'CLIENTE' ? '#bbdefb' : '#9ba1a2',
+                      fontWeight: '800',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    👤 Cliente
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setNuevo(n => ({ ...n, tipo_persona: 'PROVEEDOR' }))}
+                    style={{
+                      padding: '10px',
+                      borderRadius: '10px',
+                      border: nuevo.tipo_persona === 'PROVEEDOR' ? '2px solid #d4af37' : '1px solid #283438',
+                      background: nuevo.tipo_persona === 'PROVEEDOR' ? '#332b18' : '#121719',
+                      color: nuevo.tipo_persona === 'PROVEEDOR' ? '#ffe082' : '#9ba1a2',
+                      fontWeight: '800',
+                      fontSize: '13px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🚚 Proveedor
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <label style={{ fontSize: '12px', color: '#9ba1a2', display: 'block', marginBottom: '4px' }}>
                   Nombre Completo / Razón Social *
                 </label>
                 <input
                   type="text"
-                  placeholder="Ej: Juan Pérez"
+                  placeholder={nuevo.tipo_persona === 'PROVEEDOR' ? 'Ej: Distribuidora Veterinaria S.A.' : 'Ej: Juan Pérez'}
                   value={nuevo.nombre}
                   onChange={e => setNuevo(n => ({ ...n, nombre: e.target.value }))}
                   style={{
@@ -343,17 +470,17 @@ export default function ClientesOperador() {
                 style={{
                   marginTop: '6px',
                   width: '100%',
-                  background: '#336699',
-                  color: '#fff',
+                  background: nuevo.tipo_persona === 'PROVEEDOR' ? 'linear-gradient(135deg, #997a29, #d4af37)' : 'linear-gradient(135deg, #336699, #4a90e2)',
+                  color: nuevo.tipo_persona === 'PROVEEDOR' ? '#000' : '#fff',
                   border: 'none',
                   borderRadius: '12px',
                   padding: '14px',
-                  fontWeight: '800',
+                  fontWeight: '900',
                   fontSize: '16px',
                   cursor: 'pointer'
                 }}
               >
-                {guardando ? 'Guardando...' : 'GUARDAR CLIENTE 👤'}
+                {guardando ? 'Guardando...' : (nuevo.tipo_persona === 'PROVEEDOR' ? 'GUARDAR PROVEEDOR 🚚' : 'GUARDAR CLIENTE 👤')}
               </button>
             </form>
           </div>

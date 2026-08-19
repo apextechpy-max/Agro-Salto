@@ -204,7 +204,13 @@ export default function VentasOperador() {
       }
 
       const res = await api.createVenta(payload)
-      setExito(res)
+      setExito({
+        ...res,
+        totalCobrado: totalVenta,
+        cantItems: carrito.reduce((a, b) => a + b.cantidad, 0),
+        clienteNombre: clienteSel?.razon_social || clienteSel?.nombre || 'Cliente Ocasional',
+        formaPago
+      })
       setCarrito([])
       setMostrarCarritoModal(false)
     } catch (err) {
@@ -282,9 +288,12 @@ export default function VentasOperador() {
         }}>
           <div style={{ fontSize: '48px', marginBottom: '8px' }}>✅</div>
           <h2 style={{ color: '#73e6b2', margin: '0 0 8px 0', fontSize: '22px' }}>Venta Cobrada con Éxito</h2>
-          <p style={{ fontSize: '16px', fontWeight: '700', color: '#ffffff', margin: '0 0 16px 0' }}>
-            Total: ₲ {totalVenta.toLocaleString('es-PY')}
-          </p>
+          <div style={{ fontSize: '24px', fontWeight: '900', color: '#ffffff', margin: '0 0 8px 0' }}>
+            Total: ₲ {Number(exito.totalCobrado || exito.total || 0).toLocaleString('es-PY')}
+          </div>
+          <div style={{ fontSize: '13px', color: '#a2e8c6', marginBottom: '16px' }}>
+            Cliente: <strong>{exito.clienteNombre || 'Cliente Ocasional'}</strong> • Pago: <strong>{exito.formaPago || 'EFECTIVO'}</strong>
+          </div>
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
             <button
               onClick={() => setExito(null)}
