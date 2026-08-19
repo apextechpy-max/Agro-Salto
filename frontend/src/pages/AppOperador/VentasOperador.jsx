@@ -229,10 +229,10 @@ export default function VentasOperador() {
     }
   }
 
-  const enviarReciboWhatsapp = () => {
-    if (!exito) return
-    const tel = (telefonoWhatsappRecibo || exito.clienteTel || '').replace(/\D/g, '')
-    
+  const [copiadoToast, setCopiadoToast] = useState(false)
+
+  const armarTextoRecibo = () => {
+    if (!exito) return ''
     let msg = `🐾 *AGRO SALTO - COMPROBANTE DE VENTA*\n`
     msg += `━━━━━━━━━━━━━━━━━━━━━\n`
     msg += `🧾 *Recibo N°:* #${exito.id || '001'}\n`
@@ -250,12 +250,71 @@ export default function VentasOperador() {
     msg += `━━━━━━━━━━━━━━━━━━━━━\n`
     msg += `💰 *TOTAL PAGADO: ₲ ${Number(exito.totalCobrado || 0).toLocaleString('es-PY')}*\n\n`
     msg += `¡Muchas gracias por su preferencia! 🐶🐱🌾`
+    return msg
+  }
 
-    const url = tel 
-      ? `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`
+  const enviarReciboWhatsapp = () => {
+    if (!exito) return
+    let tel = (telefonoWhatsappRecibo || exito.clienteTel || '').replace(/\D/g, '')
+    if (tel.startsWith('0')) tel = '595' + tel.substring(1)
+    if (tel && !tel.startsWith('595') && tel.length >= 9) tel = '595' + tel
+
+    const msg = armarTextoRecibo()
+    const waUrl = tel 
+      ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`
       : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`
-      
-    window.open(url, '_blank')
+    
+    // Método 1: Creación de link nativo
+    try {
+      const a = document.createElement('a')
+      a.href = waUrl
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      document.body.appendChild(a)
+      a.click()
+      document.body.removeChild(a)
+    } catch {
+      // Fallback
+    }
+
+    // Método 2: Redirección directa para WebView de Android
+    setTimeout(() => {
+      window.location.href = waUrl
+    }, 150)
+  }
+
+  const compartirReciboNativo = async () => {
+    if (!exito) return
+    const msg = armarTextoRecibo()
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `Recibo #${exito.id} - Agro Salto`,
+          text: msg
+        })
+        return
+      } catch {
+        // Usuario canceló o no soportado
+      }
+    }
+
+    // Fallback: Copiar al portapapeles
+    copiarTextoRecibo()
+  }
+
+  const copiarTextoRecibo = () => {
+    const msg = armarTextoRecibo()
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(msg).then(() => {
+        setCopiadoToast(true)
+        setTimeout(() => setCopiadoToast(false), 2500)
+      }).catch(() => {
+        alert('📋 Recibo copiado')
+      })
+    } else {
+      alert('📋 ' + msg)
+    }
   }
 
   // Filtrado de clientes para el modal
@@ -1207,16 +1266,81 @@ export default function VentasOperador() {
                   boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)'
                 }}
               >
-                <span>💬</span> Enviar Recibo por WhatsApp
+                <span>💬</span> Abrir Chat de WhatsApp Directo
               </button>
             </div>
+
+            {/* Mensaje de copiado exitoso */}
+            {copiadoToast && (
+              <div style={{
+                background: '#1b382b',
+                border: '1px solid #2e7d58',
+                color: '#73e6b2',
+                borderRadius: '10px',
+                padding: '10px',
+                textAlign: 'center',
+                fontWeight: '800',
+                fontSize: '13px',
+                animation: 'fadeIn 0.2s ease'
+              }}>
+                ✅ ¡Texto del recibo copiado al portapapeles!
+              </div>
+            )}
 
             {/* Acciones Adicionales */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <button
-                onClick={() => window.print()}
+                onClick={compartirReciboNativo}
+                style={{
+                  background: '#243038',
+                  color: '#90caf9',
+                  border: '1px solid #336699',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>📲</span> Compartir Todo
+              </button>
+
+              <button
+                onClick={copiarTextoRecibo}
                 style={{
                   background: '#242f33',
+                  color: '#ffe082',
+                  border: '1px solid #997a29',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <span>📋</span> Copiar Texto
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  try {
+                    window.print()
+                  } catch {
+                    compartirReciboNativo()
+                  }
+                }}
+                style={{
+                  background: '#1d262a',
                   color: '#fff',
                   border: '1px solid #3a4a50',
                   borderRadius: '10px',
@@ -1228,6 +1352,7 @@ export default function VentasOperador() {
               >
                 🖨️ Imprimir / PDF
               </button>
+
               <button
                 onClick={() => setMostrarReciboModal(false)}
                 style={{
