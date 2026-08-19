@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../context/AuthContext'
 import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 
 export default function VentasOperador() {
   const navigate = useNavigate()
@@ -230,91 +231,72 @@ export default function VentasOperador() {
     }
   }
 
-  const [copiadoToast, setCopiadoToast] = useState(false)
+  const [generandoImg, setGenerandoImg] = useState(false)
 
-  const armarTextoRecibo = () => {
-    if (!exito) return ''
-    let msg = `🐾 *AGRO SALTO - COMPROBANTE DE VENTA*\n`
-    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
-    msg += `🧾 *Recibo N°:* #${exito.id || '001'}\n`
-    msg += `📅 *Fecha:* ${new Date(exito.fecha || Date.now()).toLocaleString('es-PY')}\n`
-    msg += `👤 *Cliente:* ${exito.clienteNombre || 'Cliente Ocasional'}\n`
-    if (exito.clienteRuc) msg += `📄 *RUC/CI:* ${exito.clienteRuc}\n`
-    msg += `💳 *Pago:* ${exito.formaPago || 'EFECTIVO'}\n`
-    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
-    msg += `*DETALLE DE COMPRA:*\n`
-    
-    (exito.itemsComprados || []).forEach((it, idx) => {
-      msg += `${idx + 1}. ${it.nombre}\n   ${it.cantidad} ${it.unidad_medida || 'UN'} × ₲ ${(it.precio || 0).toLocaleString('es-PY')} = *₲ ${(it.cantidad * it.precio).toLocaleString('es-PY')}*\n`
-    })
-    
-    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
-    msg += `💰 *TOTAL PAGADO: ₲ ${Number(exito.totalCobrado || 0).toLocaleString('es-PY')}*\n\n`
-    msg += `¡Muchas gracias por su preferencia! 🐶🐱🌾`
-    return msg
-  }
+  const abrirImagenRecibo = async () => {
+    const elemento = document.getElementById('recibo-ticket-imprimible')
+    if (!elemento) {
+      alert('No se encontró el elemento del recibo')
+      return
+    }
 
-  const enviarReciboWhatsapp = () => {
-    if (!exito) return
-    let tel = (telefonoWhatsappRecibo || exito.clienteTel || '').replace(/\D/g, '')
-    if (tel.startsWith('0')) tel = '595' + tel.substring(1)
-    if (tel && !tel.startsWith('595') && tel.length >= 9) tel = '595' + tel
-
-    const msg = armarTextoRecibo()
-    const waUrl = tel 
-      ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`
-      : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`
-    
-    // Método 1: Creación de link nativo
     try {
-      const a = document.createElement('a')
-      a.href = waUrl
-      a.target = '_blank'
-      a.rel = 'noopener noreferrer'
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-    } catch {
-      // Fallback
-    }
-
-    // Método 2: Redirección directa para WebView de Android
-    setTimeout(() => {
-      window.location.href = waUrl
-    }, 150)
-  }
-
-  const compartirReciboNativo = async () => {
-    if (!exito) return
-    const msg = armarTextoRecibo()
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Recibo #${exito.id} - Agro Salto`,
-          text: msg
-        })
-        return
-      } catch {
-        // Usuario canceló o no soportado
-      }
-    }
-
-    // Fallback: Copiar al portapapeles
-    copiarTextoRecibo()
-  }
-
-  const copiarTextoRecibo = () => {
-    const msg = armarTextoRecibo()
-    if (navigator.clipboard?.writeText) {
-      navigator.clipboard.writeText(msg).then(() => {
-        setCopiadoToast(true)
-        setTimeout(() => setCopiadoToast(false), 2500)
-      }).catch(() => {
-        alert('📋 Recibo copiado')
+      setGenerandoImg(true)
+      const canvas = await html2canvas(elemento, {
+        scale: 3,
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        logging: false
       })
-    } else {
-      alert('📋 ' + msg)
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          const imgData = canvas.toDataURL('image/png')
+          const win = window.open('')
+          if (win) {
+            win.document.write(`<title>Recibo #${exito?.id || ''} - Agro Salto</title><body style="margin:0;background:#0d1214;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:16px;box-sizing:border-box;"><img src="${imgData}" style="max-width:100%;max-height:92vh;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);" /></body>`)
+          } else {
+            const a = document.createElement('a')
+            a.href = imgData
+            a.download = `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`
+            a.click()
+          }
+          return
+        }
+
+        // Si el dispositivo soporta compartir archivos directamente (móviles / Android / iOS)
+        const file = new File([blob], `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`, { type: 'image/png' })
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: `Recibo #${exito?.id} - Agro Salto`,
+              text: `Recibo de Venta #${exito?.id} - Agro Salto`
+            })
+            return
+          } catch (e) {
+            if (e.name === 'AbortError') return
+          }
+        }
+
+        // Abrir la imagen en nueva pestaña para ver, guardar o reenviar
+        const url = URL.createObjectURL(blob)
+        const win = window.open(url, '_blank')
+        if (!win) {
+          // Si el navegador bloqueó la ventana emergente, forzar descarga directa
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`
+          a.target = '_blank'
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+        }
+      }, 'image/png')
+    } catch (err) {
+      alert('Error al generar imagen del recibo: ' + (err.message || err))
+    } finally {
+      setGenerandoImg(false)
     }
   }
 
@@ -1167,16 +1149,19 @@ export default function VentasOperador() {
             </div>
 
             {/* Ticket Impreso / Recibo Preview */}
-            <div style={{
-              background: '#ffffff',
-              color: '#000000',
-              borderRadius: '14px',
-              padding: '18px 16px',
-              fontFamily: 'monospace',
-              fontSize: '13px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
-              lineHeight: '1.4'
-            }}>
+            <div 
+              id="recibo-ticket-imprimible"
+              style={{
+                background: '#ffffff',
+                color: '#000000',
+                borderRadius: '14px',
+                padding: '18px 16px',
+                fontFamily: 'monospace',
+                fontSize: '13px',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                lineHeight: '1.4'
+              }}
+            >
               <div style={{ textAlign: 'center', borderBottom: '2px dashed #333', paddingBottom: '10px', marginBottom: '10px' }}>
                 <div style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '1px' }}>AGRO SALTO</div>
                 <div style={{ fontSize: '11px', color: '#555' }}>Veterinaria & Agroganadera</div>
@@ -1219,44 +1204,17 @@ export default function VentasOperador() {
               </div>
             </div>
 
-            {/* Sección Enviar por WhatsApp */}
-            <div style={{
-              background: '#121719',
-              borderRadius: '14px',
-              padding: '14px',
-              border: '1px solid #283438',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '10px'
-            }}>
-              <label style={{ fontSize: '12px', fontWeight: '700', color: '#6ed1a7' }}>
-                📱 Número de WhatsApp del Cliente
-              </label>
-              <input
-                type="text"
-                placeholder="Ej: 0981 123456 o 595981123456"
-                value={telefonoWhatsappRecibo}
-                onChange={e => setTelefonoWhatsappRecibo(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: '#1a2225',
-                  border: '1px solid #2e7d58',
-                  borderRadius: '10px',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: '700',
-                  boxSizing: 'border-box'
-                }}
-              />
+            {/* Acciones: Abrir Imagen y Cerrar */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
               <button
-                onClick={enviarReciboWhatsapp}
+                onClick={abrirImagenRecibo}
+                disabled={generandoImg}
                 style={{
-                  background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '12px',
-                  padding: '14px',
+                  padding: '16px',
                   fontSize: '15px',
                   fontWeight: '900',
                   cursor: 'pointer',
@@ -1264,106 +1222,23 @@ export default function VentasOperador() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)'
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.35)',
+                  opacity: generandoImg ? 0.7 : 1
                 }}
               >
-                <span>💬</span> Abrir Chat de WhatsApp Directo
-              </button>
-            </div>
-
-            {/* Mensaje de copiado exitoso */}
-            {copiadoToast && (
-              <div style={{
-                background: '#1b382b',
-                border: '1px solid #2e7d58',
-                color: '#73e6b2',
-                borderRadius: '10px',
-                padding: '10px',
-                textAlign: 'center',
-                fontWeight: '800',
-                fontSize: '13px',
-                animation: 'fadeIn 0.2s ease'
-              }}>
-                ✅ ¡Texto del recibo copiado al portapapeles!
-              </div>
-            )}
-
-            {/* Acciones Adicionales */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
-                onClick={compartirReciboNativo}
-                style={{
-                  background: '#243038',
-                  color: '#90caf9',
-                  border: '1px solid #336699',
-                  borderRadius: '10px',
-                  padding: '12px',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <span>📲</span> Compartir Todo
-              </button>
-
-              <button
-                onClick={copiarTextoRecibo}
-                style={{
-                  background: '#242f33',
-                  color: '#ffe082',
-                  border: '1px solid #997a29',
-                  borderRadius: '10px',
-                  padding: '12px',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-              >
-                <span>📋</span> Copiar Texto
-              </button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-              <button
-                onClick={() => {
-                  try {
-                    window.print()
-                  } catch {
-                    compartirReciboNativo()
-                  }
-                }}
-                style={{
-                  background: '#1d262a',
-                  color: '#fff',
-                  border: '1px solid #3a4a50',
-                  borderRadius: '10px',
-                  padding: '12px',
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  cursor: 'pointer'
-                }}
-              >
-                🖨️ Imprimir / PDF
+                <span>🖼️</span> {generandoImg ? 'Generando Imagen...' : 'Abrir Imagen del Comprobante'}
               </button>
 
               <button
                 onClick={() => setMostrarReciboModal(false)}
                 style={{
-                  background: '#d4af37',
-                  color: '#000',
-                  border: 'none',
-                  borderRadius: '10px',
+                  background: '#242f33',
+                  color: '#e2e8f0',
+                  border: '1px solid #3a4a50',
+                  borderRadius: '12px',
                   padding: '12px',
-                  fontSize: '13px',
-                  fontWeight: '800',
+                  fontSize: '14px',
+                  fontWeight: '700',
                   cursor: 'pointer'
                 }}
               >
