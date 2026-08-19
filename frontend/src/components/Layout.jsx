@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
 import api from '../api'
@@ -25,11 +25,18 @@ const VET_ITEMS = [
 export default function Layout() {
   const { user, logout, isAdmin, setModoInterfaz } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   const [alertas, setAlertas] = useState(0)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
     api.alertasVto().then(d => setAlertas(d.length)).catch(() => {})
   }, [])
+
+  // Cerrar sidebar al cambiar de ruta en móviles
+  useEffect(() => {
+    setSidebarOpen(false)
+  }, [location.pathname])
 
   const handleLogout = () => { logout(); navigate('/login') }
 
@@ -39,13 +46,30 @@ export default function Layout() {
 
   return (
     <div className="app-layout">
-      <aside className="sidebar">
-        <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '20px 15px' }}>
-          <img src={logoImg} alt="Logo" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'contain' }} />
-          <div>
-            <div className="logo-name" style={{ fontSize: 18, fontWeight: 800 }}>Agrosaltos</div>
-            <div className="logo-sub" style={{ fontSize: 10, opacity: 0.7 }}>Consultorio Veterinario</div>
+      {/* Backdrop para cerrar sidebar en móvil */}
+      {sidebarOpen && (
+        <div 
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <img src={logoImg} alt="Logo" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'contain' }} />
+            <div>
+              <div className="logo-name" style={{ fontSize: 18, fontWeight: 800 }}>Agrosaltos</div>
+              <div className="logo-sub" style={{ fontSize: 10, opacity: 0.7 }}>Consultorio Veterinario</div>
+            </div>
           </div>
+          <button 
+            className="sidebar-close-btn"
+            onClick={() => setSidebarOpen(false)}
+            title="Cerrar menú"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Botón rápido a Modo Móvil Simplificado */}
@@ -119,15 +143,24 @@ export default function Layout() {
 
       <div className="main-content">
         <header className="header">
-          <div className="header-title">Agrosaltos</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button 
+              className="mobile-menu-btn" 
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Abrir menú"
+            >
+              ☰
+            </button>
+            <div className="header-title">Agrosaltos</div>
+          </div>
           <div className="header-actions">
             {alertas > 0 && (
               <div className="alert-badge" onClick={() => navigate('/stock')}>
-                ⚠️ {alertas} vencimiento{alertas > 1 ? 's' : ''} próximo{alertas > 1 ? 's' : ''}
+                ⚠️ {alertas} vencimiento{alertas > 1 ? 's' : ''}
               </div>
             )}
-            <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-              {new Date().toLocaleDateString('es-PY', { weekday: 'long', day: 'numeric', month: 'long' })}
+            <span className="header-date" style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+              {new Date().toLocaleDateString('es-PY', { weekday: 'short', day: 'numeric', month: 'short' })}
             </span>
           </div>
         </header>

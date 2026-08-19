@@ -13,7 +13,7 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    const result = await db.query('SELECT * FROM usuarios WHERE usuario = $1 AND activo = 1', [usuario]);
+    const result = await db.query('SELECT * FROM usuarios WHERE LOWER(usuario) = LOWER($1) AND activo = 1', [usuario]);
     const user = result.rows[0];
 
     if (!user || !bcrypt.compareSync(password, user.password_hash)) {

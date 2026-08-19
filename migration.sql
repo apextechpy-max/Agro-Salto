@@ -339,4 +339,10 @@ INSERT INTO usuarios (usuario, password_hash, nombre_completo, perfil, filial_id
 VALUES ('admin', '$2a$10$9UaHbottCM49odk5EWsZSuzUL8AaDw4YuzWaX10X/dy2z7f4Ddz2O', 'Administrador Principal', 'ADMIN', 1, 1)
 ON CONFLICT (usuario) DO UPDATE SET password_hash = EXCLUDED.password_hash;
 -- Contraseña por defecto: admin123
+
+INSERT INTO usuarios (usuario, password_hash, nombre_completo, perfil, filial_id, activo)
+VALUES ('Caja1', '$2a$10$eqs6TqVnVhPGUbu5ro6O7OvhD8ChHXq7fv3jWZwGxzpEhrx0YgEF2', 'Operador Caja 1', 'CAJERO_1', 1, 1)
+ON CONFLICT (usuario) DO UPDATE SET password_hash = EXCLUDED.password_hash;
+-- Contraseña por defecto: 12345
+
 INSERT INTO cajas (nombre, filial_id, activa) VALUES ('Caja Principal', 1, 1);

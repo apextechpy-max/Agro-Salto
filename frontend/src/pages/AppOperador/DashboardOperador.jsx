@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import api from '../../api'
 import medallonImg from '../../assets/medallon_final.png'
 
 export default function DashboardOperador() {
@@ -10,8 +11,7 @@ export default function DashboardOperador() {
 
   useEffect(() => {
     // Verificamos si hay una caja abierta para el operador
-    fetch('/_/backend/api/caja/apertura-activa')
-      .then(res => res.ok ? res.json() : null)
+    api.aperturaActiva(user?.filial_id || 1)
       .then(data => {
         if (data && data.id) {
           setCajaEstado({ abierta: true, loading: false, data })
@@ -20,7 +20,7 @@ export default function DashboardOperador() {
         }
       })
       .catch(() => setCajaEstado({ abierta: false, loading: false }))
-  }, [])
+  }, [user?.filial_id])
 
   return (
     <div style={{
