@@ -12,7 +12,7 @@ export default function VentasOperador() {
   const [loadingProds, setLoadingProds] = useState(false)
   const [carrito, setCarrito] = useState([])
   const [clientes, setClientes] = useState([])
-  const [clienteSel, setClienteSel] = useState('')
+  const [clienteSel, setClienteSel] = useState(null) // null = Cliente Ocasional
   const [formaPago, setFormaPago] = useState('EFECTIVO')
   const [tipoComprobante, setTipoComprobante] = useState('TICKET')
   
@@ -20,6 +20,19 @@ export default function VentasOperador() {
   const [error, setError] = useState('')
   const [exito, setExito] = useState(null)
   const [mostrarCarritoModal, setMostrarCarritoModal] = useState(false)
+
+  // Modal Selector de Cantidad con Control de Stock
+  const [prodParaAgregar, setProdParaAgregar] = useState(null)
+  const [cantParaAgregar, setCantParaAgregar] = useState(1)
+  const [errorCantidad, setErrorCantidad] = useState('')
+
+  // Modal Selector y Creación de Clientes
+  const [mostrarModalClientes, setMostrarModalClientes] = useState(false)
+  const [busquedaCliente, setBusquedaCliente] = useState('')
+  const [mostrarFormNuevoCliente, setMostrarFormNuevoCliente] = useState(false)
+  const [nuevoCliente, setNuevoCliente] = useState({ razon_social: '', ruc: '', telefono: '' })
+  const [guardandoCliente, setGuardandoCliente] = useState(false)
+  const [errorCliente, setErrorCliente] = useState('')
 
   // Cargar lista inicial de productos y clientes
   useEffect(() => {
@@ -30,8 +43,9 @@ export default function VentasOperador() {
   const fetchProductos = async (q) => {
     setLoadingProds(true)
     try {
-      const data = await api.productos(q ? `?q=${encodeURIComponent(q)}` : '')
-      setProductos(Array.isArray(data) ? data : (data.productos || []))
+      const data = await api.productos(q ? `?buscar=${encodeURIComponent(q)}` : '')
+      const list = Array.isArray(data) ? data : (data.productos || [])
+      setProductos(list)
     } catch (err) {
       console.error(err)
     } finally {
@@ -44,8 +58,6 @@ export default function VentasOperador() {
       const data = await api.personas('?tipo=CLIENTE')
       const list = Array.isArray(data) ? data : (data.personas || [])
       setClientes(list)
-      const cf = list.find(c => c.nombre?.toUpperCase().includes('CONSUMIDOR'))
-      if (cf) setClienteSel(cf.id)
     } catch (err) {
       console.error(err)
     }
@@ -57,36 +69,116 @@ export default function VentasOperador() {
     fetchProductos(text)
   }
 
-  const agregarAlCarrito = (prod) => {
+  // Al hacer clic en "+ Agregar"
+  const abrirModalCantidad = (prod) => {
+    const stockDisp = Number(prod.stock_actual ?? prod.stock ?? prod.stock_total ?? 0)
+    if (stockDisp <= 0) {
+      alert(`⚠️ El producto "${prod.nombre}" no tiene stock disponible actualmente.`)
+      return
+    }
+
+    const yaEnCarrito = carrito.find(item => item.id === prod.id)?.cantidad || 0
+    const disponibleReal = stockDisp - yaEnCarrito
+
+    if (disponibleReal <= 0) {
+      alert(`⚠️ Ya has agregado todo el stock disponible (${stockDisp} unidades) de este producto al carrito.`)
+      return
+    }
+
+    setProdParaAgregar({ ...prod, stockDisp, disponibleReal })
+    setCantParaAgregar(1)
+    setErrorCantidad('')
+  }
+
+  const confirmarAgregarCantidad = () => {
+    if (!prodParaAgregar) return
+    const cantNum = Number(cantParaAgregar) || 0
+    if (cantNum <= 0) {
+      setErrorCantidad('Ingresa una cantidad mayor a 0')
+      return
+    }
+    if (cantNum > prodParaAgregar.disponibleReal) {
+      setErrorCantidad(`Solo puedes agregar hasta ${prodParaAgregar.disponibleReal} unidad(es)`)
+      return
+    }
+
     setCarrito(prev => {
-      const idx = prev.findIndex(item => item.id === prod.id)
+      const idx = prev.findIndex(item => item.id === prodParaAgregar.id)
+      const precio = Number(prodParaAgregar.precio_venta_menor || prodParaAgregar.precio_venta) || 0
       if (idx >= 0) {
         const copy = [...prev]
-        copy[idx].cantidad += 1
+        copy[idx].cantidad += cantNum
         return copy
       } else {
         return [...prev, {
-          id: prod.id,
-          nombre: prod.nombre,
-          precio: Number(prod.precio_venta) || 0,
-          cantidad: 1,
-          unidad_medida: prod.unidad_medida || 'UN'
+          id: prodParaAgregar.id,
+          nombre: prodParaAgregar.nombre,
+          precio,
+          cantidad: cantNum,
+          stockTotal: prodParaAgregar.stockDisp,
+          unidad_medida: prodParaAgregar.unidad_medida || 'UN',
+          iva_tipo: prodParaAgregar.iva_tipo || '10'
         }]
       }
     })
+
+    setProdParaAgregar(null)
   }
 
-  const modificarCantidad = (id, delta) => {
+  const modificarCantidadCarrito = (id, delta) => {
     setCarrito(prev => prev.map(item => {
       if (item.id === id) {
-        const n = item.cantidad + delta
-        return n > 0 ? { ...item, cantidad: n } : null
+        const nuevaCant = item.cantidad + delta
+        if (nuevaCant <= 0) return null
+        if (delta > 0 && item.stockTotal && nuevaCant > item.stockTotal) {
+          alert(`⚠️ No puedes agregar más. El stock máximo disponible es ${item.stockTotal} unidades.`)
+          return item
+        }
+        return { ...item, cantidad: nuevaCant }
       }
       return item
     }).filter(Boolean))
   }
 
   const totalVenta = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0)
+
+  const handleCrearNuevoCliente = async (e) => {
+    e.preventDefault()
+    if (!nuevoCliente.razon_social.trim()) {
+      setErrorCliente('Ingresa el nombre del cliente')
+      return
+    }
+    setGuardandoCliente(true)
+    setErrorCliente('')
+
+    try {
+      const res = await api.createPersona({
+        tipo: 'CLIENTE',
+        razon_social: nuevoCliente.razon_social.trim().toUpperCase(),
+        ruc: nuevoCliente.ruc.trim(),
+        telefono: nuevoCliente.telefono.trim(),
+        condicion_iva: 'CONTRIBUYENTE',
+        condicion_pago: 'CONTADO'
+      })
+
+      const nuevoObj = {
+        id: res.id,
+        razon_social: nuevoCliente.razon_social.trim().toUpperCase(),
+        ruc: nuevoCliente.ruc.trim(),
+        telefono: nuevoCliente.telefono.trim()
+      }
+
+      setClientes(prev => [nuevoObj, ...prev])
+      setClienteSel(nuevoObj)
+      setMostrarFormNuevoCliente(false)
+      setMostrarModalClientes(false)
+      setNuevoCliente({ razon_social: '', ruc: '', telefono: '' })
+    } catch (err) {
+      setErrorCliente(err.message || 'Error al registrar cliente')
+    } finally {
+      setGuardandoCliente(false)
+    }
+  }
 
   const handleConfirmarVenta = async () => {
     if (carrito.length === 0) return
@@ -95,13 +187,19 @@ export default function VentasOperador() {
 
     try {
       const payload = {
-        persona_id: clienteSel || null,
-        forma_pago: formaPago,
+        cliente_id: clienteSel?.id || null,
+        filial_id: user?.filial_id || 1,
+        tipo: 'MINORISTA',
+        tipo_pago: formaPago,
         tipo_comprobante: tipoComprobante,
-        detalles: carrito.map(item => ({
+        monto_pagado: totalVenta,
+        moneda_pago: 'GS',
+        items: carrito.map(item => ({
           producto_id: item.id,
           cantidad: item.cantidad,
-          precio_unitario: item.precio
+          precio_unit: item.precio,
+          descuento: 0,
+          iva_tipo: item.iva_tipo || '10'
         }))
       }
 
@@ -115,6 +213,18 @@ export default function VentasOperador() {
       setProcesando(false)
     }
   }
+
+  // Filtrado de clientes para el modal
+  const clientesFiltrados = clientes.filter(c => {
+    if (!busquedaCliente.trim()) return true
+    const q = busquedaCliente.toLowerCase()
+    return (
+      c.razon_social?.toLowerCase().includes(q) ||
+      c.nombre?.toLowerCase().includes(q) ||
+      c.ruc?.toLowerCase().includes(q) ||
+      c.telefono?.toLowerCase().includes(q)
+    )
+  })
 
   return (
     <div style={{
@@ -161,7 +271,7 @@ export default function VentasOperador() {
         <div style={{ width: '40px' }} />
       </header>
 
-      {/* Exito Modal */}
+      {/* Exito Banner/Modal */}
       {exito && (
         <div style={{
           padding: '24px',
@@ -211,6 +321,43 @@ export default function VentasOperador() {
       {/* Main Body */}
       <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
         
+        {/* Barra de Cliente Seleccionado (Toca para cambiar) */}
+        <div
+          onClick={() => {
+            setBusquedaCliente('')
+            setMostrarFormNuevoCliente(false)
+            setMostrarModalClientes(true)
+          }}
+          style={{
+            background: '#18241e',
+            border: '1px solid #2e7d58',
+            borderRadius: '14px',
+            padding: '12px 14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '22px' }}>👤</span>
+            <div>
+              <div style={{ fontSize: '11px', color: '#9ba1a2', textTransform: 'uppercase', fontWeight: '700' }}>
+                Cliente de la Venta
+              </div>
+              <div style={{ fontSize: '15px', fontWeight: '800', color: '#73e6b2' }}>
+                {clienteSel ? (clienteSel.razon_social || clienteSel.nombre) : 'Cliente Ocasional'}
+              </div>
+              {clienteSel?.ruc && (
+                <div style={{ fontSize: '11px', color: '#9ba1a2' }}>RUC/CI: {clienteSel.ruc}</div>
+              )}
+            </div>
+          </div>
+          <span style={{ fontSize: '12px', background: '#243a2c', color: '#6ed1a7', padding: '4px 10px', borderRadius: '8px', fontWeight: '700' }}>
+            Cambiar ▾
+          </span>
+        </div>
+
         {/* Buscador de productos */}
         <div>
           <label style={{ fontSize: '13px', color: '#9ba1a2', fontWeight: '600', marginBottom: '6px', display: 'block' }}>
@@ -218,7 +365,7 @@ export default function VentasOperador() {
           </label>
           <input
             type="text"
-            placeholder="Escribe el nombre o código de lote..."
+            placeholder="Escribe el nombre o código..."
             value={busqueda}
             onChange={handleBuscar}
             style={{
@@ -242,50 +389,58 @@ export default function VentasOperador() {
           ) : productos.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#9ba1a2', padding: '20px' }}>No se encontraron productos</div>
           ) : (
-            productos.map(p => (
-              <div
-                key={p.id}
-                style={{
-                  background: '#1b2326',
-                  border: '1px solid #283438',
-                  borderRadius: '14px',
-                  padding: '12px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '10px'
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>
-                    {p.nombre}
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#73e6b2', fontWeight: '800', marginTop: '2px' }}>
-                    ₲ {Number(p.precio_venta).toLocaleString('es-PY')}
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#9ba1a2' }}>
-                    Stock: {p.stock_actual ?? p.stock ?? 'S/D'} {p.unidad_medida || 'UN'}
-                  </div>
-                </div>
+            productos.map(p => {
+              const stock = Number(p.stock_actual ?? p.stock ?? p.stock_total ?? 0)
+              const sinStock = stock <= 0
+              const precio = Number(p.precio_venta_menor || p.precio_venta || 0)
 
-                <button
-                  onClick={() => agregarAlCarrito(p)}
+              return (
+                <div
+                  key={p.id}
                   style={{
-                    background: '#2e7d58',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '10px 14px',
-                    fontWeight: '800',
-                    fontSize: '14px',
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    background: sinStock ? '#181c1e' : '#1b2326',
+                    border: `1px solid ${sinStock ? '#332426' : '#283438'}`,
+                    borderRadius: '14px',
+                    padding: '12px 16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '10px',
+                    opacity: sinStock ? 0.65 : 1
                   }}
                 >
-                  + Agregar
-                </button>
-              </div>
-            ))
+                  <div>
+                    <div style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>
+                      {p.nombre}
+                    </div>
+                    <div style={{ fontSize: '14px', color: '#73e6b2', fontWeight: '800', marginTop: '2px' }}>
+                      ₲ {precio.toLocaleString('es-PY')}
+                    </div>
+                    <div style={{ fontSize: '11px', color: sinStock ? '#ff8787' : '#9ba1a2', fontWeight: sinStock ? '700' : '500' }}>
+                      {sinStock ? '❌ Sin stock disponible' : `Stock: ${stock} ${p.unidad_medida || 'UN'}`}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => abrirModalCantidad(p)}
+                    disabled={sinStock}
+                    style={{
+                      background: sinStock ? '#2d2426' : '#2e7d58',
+                      color: sinStock ? '#7a6064' : '#fff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      fontWeight: '800',
+                      fontSize: '14px',
+                      cursor: sinStock ? 'not-allowed' : 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    + Agregar
+                  </button>
+                </div>
+              )
+            })
           )}
         </div>
       </div>
@@ -300,10 +455,9 @@ export default function VentasOperador() {
       }}>
         {carrito.length > 0 ? (
           <div>
-            {/* Vista previa de items */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <div>
-                <span style={{ fontSize: '14px', color: '#9ba1a2' }}>Carrito ({carrito.length} items):</span>
+                <span style={{ fontSize: '13px', color: '#9ba1a2' }}>Carrito ({carrito.length} items):</span>
                 <div style={{ fontSize: '20px', fontWeight: '900', color: '#73e6b2' }}>
                   ₲ {totalVenta.toLocaleString('es-PY')}
                 </div>
@@ -322,59 +476,36 @@ export default function VentasOperador() {
                   cursor: 'pointer'
                 }}
               >
-                Ver Detalle 📋
+                Ver Detalle ({carrito.reduce((a, b) => a + b.cantidad, 0)}) 📋
               </button>
             </div>
 
-            {/* Selección rápida de Cliente y Medio de Pago */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
-              <div>
-                <label style={{ fontSize: '11px', color: '#9ba1a2', display: 'block', marginBottom: '4px' }}>Cliente</label>
-                <select
-                  value={clienteSel}
-                  onChange={e => setClienteSel(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#121719',
-                    color: '#fff',
-                    border: '1px solid #3a4a50',
-                    borderRadius: '8px',
-                    padding: '8px',
-                    fontSize: '13px'
-                  }}
-                >
-                  <option value="">Consumidor Final</option>
-                  {clientes.map(c => (
-                    <option key={c.id} value={c.id}>{c.nombre}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label style={{ fontSize: '11px', color: '#9ba1a2', display: 'block', marginBottom: '4px' }}>Forma de Pago</label>
-                <select
-                  value={formaPago}
-                  onChange={e => setFormaPago(e.target.value)}
-                  style={{
-                    width: '100%',
-                    background: '#121719',
-                    color: '#fff',
-                    border: '1px solid #3a4a50',
-                    borderRadius: '8px',
-                    padding: '8px',
-                    fontSize: '13px'
-                  }}
-                >
-                  <option value="EFECTIVO">💵 Efectivo</option>
-                  <option value="TARJETA">💳 Tarjeta</option>
-                  <option value="TRANSFERENCIA">🏦 Transferencia</option>
-                  <option value="CREDITO">📝 Crédito CC</option>
-                </select>
-              </div>
+            {/* Selector de Forma de Pago */}
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ fontSize: '11px', color: '#9ba1a2', display: 'block', marginBottom: '4px', fontWeight: '700' }}>Forma de Pago</label>
+              <select
+                value={formaPago}
+                onChange={e => setFormaPago(e.target.value)}
+                style={{
+                  width: '100%',
+                  background: '#121719',
+                  color: '#fff',
+                  border: '1px solid #3a4a50',
+                  borderRadius: '10px',
+                  padding: '10px',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                <option value="EFECTIVO">💵 Efectivo</option>
+                <option value="TARJETA">💳 Tarjeta (POS)</option>
+                <option value="TRANSFERENCIA">🏦 Transferencia Bancaria</option>
+                <option value="CREDITO">📝 Cuenta Corriente (Crédito)</option>
+              </select>
             </div>
 
             {error && (
-              <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', textAlign: 'center' }}>
+              <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', textAlign: 'center', fontWeight: '700' }}>
                 ⚠️ {error}
               </div>
             )}
@@ -405,15 +536,354 @@ export default function VentasOperador() {
         )}
       </footer>
 
-      {/* Modal de Detalle de Carrito */}
+      {/* MODAL 1: PREGUNTAR CANTIDAD CON CONTROL DE STOCK */}
+      {prodParaAgregar && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          zIndex: 1000,
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: '#1a2225',
+            width: '100%',
+            maxWidth: '500px',
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
+            padding: '24px 20px',
+            borderTop: '3px solid #4db687'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+              <div>
+                <h3 style={{ margin: 0, color: '#ffffff', fontSize: '17px', fontWeight: '800' }}>
+                  {prodParaAgregar.nombre}
+                </h3>
+                <div style={{ fontSize: '13px', color: '#73e6b2', fontWeight: '700', marginTop: '2px' }}>
+                  ₲ {Number(prodParaAgregar.precio_venta_menor || prodParaAgregar.precio_venta || 0).toLocaleString('es-PY')} / {prodParaAgregar.unidad_medida || 'UN'}
+                </div>
+              </div>
+              <button
+                onClick={() => setProdParaAgregar(null)}
+                style={{ background: '#243035', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ background: '#121719', borderRadius: '12px', padding: '10px 14px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', color: '#9ba1a2' }}>Stock Disponible:</span>
+              <span style={{ fontSize: '15px', fontWeight: '800', color: '#a7f3d0' }}>
+                {prodParaAgregar.disponibleReal} {prodParaAgregar.unidad_medida || 'UN'}
+              </span>
+            </div>
+
+            {errorCantidad && (
+              <div style={{ color: '#ff8787', fontSize: '13px', marginBottom: '12px', textAlign: 'center', fontWeight: '700' }}>
+                ⚠️ {errorCantidad}
+              </div>
+            )}
+
+            {/* Stepper interactivo de cantidad */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginBottom: '16px' }}>
+              <button
+                type="button"
+                onClick={() => setCantParaAgregar(prev => Math.max(1, Number(prev) - 1))}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: '#2a1a1f',
+                  color: '#ff8787',
+                  border: '1px solid #5a242c',
+                  fontSize: '24px',
+                  fontWeight: '900',
+                  cursor: 'pointer'
+                }}
+              >
+                -
+              </button>
+
+              <input
+                type="number"
+                min="1"
+                max={prodParaAgregar.disponibleReal}
+                value={cantParaAgregar}
+                onChange={e => {
+                  const val = Number(e.target.value) || 1
+                  setCantParaAgregar(val)
+                }}
+                style={{
+                  width: '100px',
+                  height: '48px',
+                  background: '#0d1214',
+                  border: '2px solid #2e7d58',
+                  borderRadius: '12px',
+                  color: '#73e6b2',
+                  fontSize: '22px',
+                  fontWeight: '900',
+                  textAlign: 'center'
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={() => setCantParaAgregar(prev => Math.min(prodParaAgregar.disponibleReal, Number(prev) + 1))}
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  background: '#1b382b',
+                  color: '#73e6b2',
+                  border: '1px solid #2e7d58',
+                  fontSize: '24px',
+                  fontWeight: '900',
+                  cursor: 'pointer'
+                }}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Botón de Todo el Stock */}
+            {prodParaAgregar.disponibleReal > 1 && (
+              <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+                <button
+                  type="button"
+                  onClick={() => setCantParaAgregar(prodParaAgregar.disponibleReal)}
+                  style={{
+                    background: '#1d2a24',
+                    border: '1px dashed #4db687',
+                    color: '#a7f3d0',
+                    borderRadius: '8px',
+                    padding: '6px 14px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ⚡ Todo el stock disponible ({prodParaAgregar.disponibleReal})
+                </button>
+              </div>
+            )}
+
+            <button
+              onClick={confirmarAgregarCantidad}
+              style={{
+                width: '100%',
+                background: 'linear-gradient(135deg, #10b981, #059669)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '14px',
+                padding: '16px',
+                fontSize: '16px',
+                fontWeight: '900',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)'
+              }}
+            >
+              Agregar al Carrito ₲ {(Number(prodParaAgregar.precio_venta_menor || prodParaAgregar.precio_venta || 0) * (Number(cantParaAgregar) || 1)).toLocaleString('es-PY')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: SELECTOR Y CREACIÓN DE CLIENTES */}
+      {mostrarModalClientes && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          zIndex: 1000,
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: '#1a2225',
+            width: '100%',
+            maxWidth: '500px',
+            borderTopLeftRadius: '24px',
+            borderTopRightRadius: '24px',
+            padding: '20px',
+            maxHeight: '85vh',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, color: '#73e6b2', fontSize: '18px', fontWeight: '800' }}>
+                Seleccionar Cliente
+              </h3>
+              <button
+                onClick={() => setMostrarModalClientes(false)}
+                style={{ background: '#243035', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Opción rápida: Cliente Ocasional */}
+            <div
+              onClick={() => {
+                setClienteSel(null)
+                setMostrarModalClientes(false)
+              }}
+              style={{
+                background: !clienteSel ? '#1d382b' : '#141c1f',
+                border: `2px solid ${!clienteSel ? '#4db687' : '#283438'}`,
+                borderRadius: '12px',
+                padding: '12px 16px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: '800', color: '#ffffff' }}>
+                  👤 Cliente Ocasional (Predeterminado)
+                </div>
+                <div style={{ fontSize: '12px', color: '#9ba1a2' }}>Sin comprobante nominativo</div>
+              </div>
+              {!clienteSel && <span style={{ color: '#73e6b2', fontSize: '18px' }}>✓</span>}
+            </div>
+
+            {/* Buscador de clientes */}
+            <input
+              type="text"
+              placeholder="🔍 Buscar por nombre, RUC o CI..."
+              value={busquedaCliente}
+              onChange={e => setBusquedaCliente(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                background: '#121719',
+                border: '1px solid #3a4a50',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+
+            {/* Formulario nuevo cliente inline */}
+            {mostrarFormNuevoCliente ? (
+              <form onSubmit={handleCrearNuevoCliente} style={{ background: '#121719', padding: '14px', borderRadius: '12px', border: '1px solid #2e7d58', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '800', color: '#73e6b2' }}>➕ Nuevo Cliente Rápido</div>
+                {errorCliente && <div style={{ color: '#ff8787', fontSize: '12px' }}>⚠️ {errorCliente}</div>}
+                <input
+                  type="text"
+                  placeholder="Nombre / Razón Social *"
+                  value={nuevoCliente.razon_social}
+                  onChange={e => setNuevoCliente({ ...nuevoCliente, razon_social: e.target.value })}
+                  style={{ width: '100%', padding: '10px', background: '#1a2225', border: '1px solid #334', borderRadius: '8px', color: '#fff', fontSize: '13px' }}
+                />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="RUC o CI"
+                    value={nuevoCliente.ruc}
+                    onChange={e => setNuevoCliente({ ...nuevoCliente, ruc: e.target.value })}
+                    style={{ width: '100%', padding: '10px', background: '#1a2225', border: '1px solid #334', borderRadius: '8px', color: '#fff', fontSize: '13px' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Teléfono"
+                    value={nuevoCliente.telefono}
+                    onChange={e => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                    style={{ width: '100%', padding: '10px', background: '#1a2225', border: '1px solid #334', borderRadius: '8px', color: '#fff', fontSize: '13px' }}
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="submit"
+                    disabled={guardandoCliente}
+                    style={{ flex: 1, background: '#2e7d58', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px', fontWeight: '700', cursor: 'pointer' }}
+                  >
+                    {guardandoCliente ? 'Guardando...' : 'Guardar y Seleccionar'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMostrarFormNuevoCliente(false)}
+                    style={{ background: '#2d373b', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px', cursor: 'pointer' }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setMostrarFormNuevoCliente(true)}
+                style={{
+                  background: '#1d262a',
+                  border: '1px dashed #3a4a50',
+                  color: '#6ed1a7',
+                  borderRadius: '10px',
+                  padding: '10px',
+                  fontWeight: '700',
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+              >
+                ➕ Registrar Nuevo Cliente
+              </button>
+            )}
+
+            {/* Lista scrolleable de clientes */}
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '35vh' }}>
+              {clientesFiltrados.map(c => {
+                const nombre = c.razon_social || c.nombre
+                const esSel = clienteSel?.id === c.id
+
+                return (
+                  <div
+                    key={c.id}
+                    onClick={() => {
+                      setClienteSel(c)
+                      setMostrarModalClientes(false)
+                    }}
+                    style={{
+                      background: esSel ? '#1b382b' : '#141c1f',
+                      border: `1px solid ${esSel ? '#2e7d58' : '#243035'}`,
+                      borderRadius: '10px',
+                      padding: '10px 14px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: '700', fontSize: '14px', color: '#fff' }}>{nombre}</div>
+                      <div style={{ fontSize: '11px', color: '#9ba1a2' }}>
+                        {c.ruc ? `RUC/CI: ${c.ruc}` : ''} {c.telefono ? `• Tel: ${c.telefono}` : ''}
+                      </div>
+                    </div>
+                    {esSel && <span style={{ color: '#73e6b2', fontWeight: '900' }}>✓</span>}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 3: DETALLE DEL CARRITO */}
       {mostrarCarritoModal && (
         <div style={{
           position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)',
+          inset: 0,
+          background: 'rgba(0,0,0,0.85)',
           display: 'flex',
           alignItems: 'flex-end',
-          zIndex: 100
+          zIndex: 1000,
+          animation: 'fadeIn 0.2s ease-out'
         }}>
           <div style={{
             background: '#1a2225',
@@ -458,7 +928,7 @@ export default function VentasOperador() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <button
-                      onClick={() => modificarCantidad(item.id, -1)}
+                      onClick={() => modificarCantidadCarrito(item.id, -1)}
                       style={{
                         background: '#3a2428',
                         color: '#ff6b6b',
@@ -473,11 +943,11 @@ export default function VentasOperador() {
                     >
                       -
                     </button>
-                    <span style={{ fontWeight: '800', fontSize: '15px', width: '20px', textAlign: 'center' }}>
+                    <span style={{ fontWeight: '800', fontSize: '15px', width: '24px', textAlign: 'center' }}>
                       {item.cantidad}
                     </span>
                     <button
-                      onClick={() => modificarCantidad(item.id, 1)}
+                      onClick={() => modificarCantidadCarrito(item.id, 1)}
                       style={{
                         background: '#1b382b',
                         color: '#73e6b2',
@@ -510,7 +980,7 @@ export default function VentasOperador() {
                 cursor: 'pointer'
               }}
             >
-              Listo / Volver
+              Listo / Volver a Productos
             </button>
           </div>
         </div>

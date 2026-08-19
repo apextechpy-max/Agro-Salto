@@ -8,19 +8,108 @@ export default function DashboardOperador() {
   const { user, logout, setModoInterfaz, isAdmin } = useAuth()
   const navigate = useNavigate()
   const [cajaEstado, setCajaEstado] = useState({ abierta: false, loading: true })
+  
+  // Modal de Apertura Obligatoria
+  const [mostrarModalApertura, setMostrarModalApertura] = useState(false)
+  const [cajasDisponibles, setCajasDisponibles] = useState([])
+  const [cajaSeleccionada, setCajaSeleccionada] = useState('')
+  const [montoInicial, setMontoInicial] = useState('0')
+  const [cambioUsd, setCambioUsd] = useState('7800')
+  const [cambioBrl, setCambioBrl] = useState('1450')
+  const [cambioArs, setCambioArs] = useState('8')
+  const [abriendoCaja, setAbriendoCaja] = useState(false)
+  const [errorApertura, setErrorApertura] = useState('')
+  const [rutaDestinoPendiente, setRutaDestinoPendiente] = useState(null)
+
+  const verificarCaja = async () => {
+    try {
+      const filialId = user?.filial_id || 1
+      const cajas = await api.cajas(filialId)
+      const listCajas = Array.isArray(cajas) ? cajas : []
+      setCajasDisponibles(listCajas)
+      if (listCajas.length > 0) {
+        setCajaSeleccionada(listCajas[0].id)
+      }
+
+      // Verificamos si alguna caja de la filial está abierta
+      let aperturaEncontrada = null
+      for (const c of listCajas) {
+        try {
+          const ap = await api.aperturaActiva(c.id)
+          if (ap && ap.id) {
+            aperturaEncontrada = ap
+            break
+          }
+        } catch {
+          // continuar
+        }
+      }
+
+      if (aperturaEncontrada) {
+        setCajaEstado({ abierta: true, loading: false, data: aperturaEncontrada })
+      } else {
+        setCajaEstado({ abierta: false, loading: false })
+      }
+    } catch {
+      setCajaEstado({ abierta: false, loading: false })
+    }
+  }
 
   useEffect(() => {
-    // Verificamos si hay una caja abierta para el operador
-    api.aperturaActiva(user?.filial_id || 1)
-      .then(data => {
-        if (data && data.id) {
-          setCajaEstado({ abierta: true, loading: false, data })
-        } else {
-          setCajaEstado({ abierta: false, loading: false })
-        }
-      })
-      .catch(() => setCajaEstado({ abierta: false, loading: false }))
+    verificarCaja()
   }, [user?.filial_id])
+
+  const manejarNavegacion = (ruta) => {
+    if (!cajaEstado.abierta) {
+      setRutaDestinoPendiente(ruta)
+      setMostrarModalApertura(true)
+      return
+    }
+    navigate(ruta)
+  }
+
+  const sumarMontoRapido = (valor) => {
+    const act = Number(montoInicial.replace(/\D/g, '')) || 0
+    const nuevo = act + valor
+    setMontoInicial(nuevo.toLocaleString('es-PY'))
+  }
+
+  const handleConfirmarApertura = async (e) => {
+    e.preventDefault()
+    const montoNum = Number(String(montoInicial).replace(/\D/g, '')) || 0
+    if (!cajaSeleccionada) {
+      setErrorApertura('Selecciona una caja para abrir')
+      return
+    }
+
+    setAbriendoCaja(true)
+    setErrorApertura('')
+
+    try {
+      await api.abrirCaja({
+        caja_id: cajaSeleccionada,
+        monto_inicial: montoNum,
+        cambio_usd: Number(cambioUsd) || 0,
+        cambio_brl: Number(cambioBrl) || 0,
+        cambio_ars: Number(cambioArs) || 0
+      })
+
+      // Actualizar estado de caja
+      await verificarCaja()
+      setMostrarModalApertura(false)
+
+      // Si el usuario quería ir a una ruta en específico, navega automáticamente
+      if (rutaDestinoPendiente) {
+        const dest = rutaDestinoPendiente
+        setRutaDestinoPendiente(null)
+        navigate(dest)
+      }
+    } catch (err) {
+      setErrorApertura(err.message || 'Error al abrir la caja')
+    } finally {
+      setAbriendoCaja(false)
+    }
+  }
 
   return (
     <div style={{
@@ -58,13 +147,16 @@ export default function DashboardOperador() {
               AGRO SALTO
             </div>
             <div style={{ fontSize: '12px', color: '#9ba1a2', fontWeight: '600' }}>
-              👤 {user?.nombre || user?.usuario || 'Operador'} ({user?.perfil || 'Cajero'})
+              👤 {user?.nombre_completo || user?.usuario || 'Operador'} ({user?.perfil || 'Cajero'})
             </div>
           </div>
         </div>
 
         <button
-          onClick={logout}
+          onClick={() => {
+            logout()
+            navigate('/login')
+          }}
           style={{
             background: '#2a1a1f',
             color: '#ff6b6b',
@@ -84,35 +176,46 @@ export default function DashboardOperador() {
       <main style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', gap: '20px' }}>
         
         {/* Banner Estado de Caja */}
-        <div style={{
-          background: cajaEstado.abierta ? 'rgba(77, 182, 135, 0.12)' : 'rgba(255, 107, 107, 0.12)',
-          border: `1px solid ${cajaEstado.abierta ? '#4db687' : '#ff6b6b'}`,
-          borderRadius: '14px',
-          padding: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>{cajaEstado.abierta ? '🟢' : '🔴'}</span>
+        <div 
+          onClick={() => {
+            if (!cajaEstado.abierta) setMostrarModalApertura(true)
+          }}
+          style={{
+            background: cajaEstado.abierta ? 'rgba(77, 182, 135, 0.12)' : 'rgba(255, 107, 107, 0.16)',
+            border: `1px solid ${cajaEstado.abierta ? '#4db687' : '#ff6b6b'}`,
+            borderRadius: '14px',
+            padding: '14px 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: cajaEstado.abierta ? 'default' : 'pointer'
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '24px' }}>{cajaEstado.abierta ? '🟢' : '🔴'}</span>
             <div>
-              <div style={{ fontSize: '13px', fontWeight: '700', color: cajaEstado.abierta ? '#6ed1a7' : '#ff8787' }}>
-                {cajaEstado.abierta ? 'Caja Abierta' : 'Caja Cerrada'}
+              <div style={{ fontSize: '14px', fontWeight: '800', color: cajaEstado.abierta ? '#6ed1a7' : '#ff8787' }}>
+                {cajaEstado.abierta ? `Caja Abierta (${cajaEstado.data?.caja_nombre || 'Caja Principal'})` : 'Caja Cerrada - ¡Toca para Abrir!'}
               </div>
-              <div style={{ fontSize: '11px', color: '#9ba1a2' }}>
-                {cajaEstado.abierta ? `Monto Inicial: ₲ ${cajaEstado.data?.monto_inicial?.toLocaleString('es-PY') || '0'}` : 'Requiere apertura para cobrar'}
+              <div style={{ fontSize: '12px', color: '#9ba1a2', marginTop: '2px' }}>
+                {cajaEstado.abierta 
+                  ? `Monto Inicial: ₲ ${Number(cajaEstado.data?.monto_inicial || 0).toLocaleString('es-PY')}` 
+                  : '⚠️ Es obligatorio abrir caja antes de realizar operaciones'}
               </div>
             </div>
           </div>
+          {!cajaEstado.abierta && (
+            <span style={{ fontSize: '18px', color: '#ff8787' }}>➔</span>
+          )}
         </div>
 
         {/* Título Operador */}
-        <div style={{ textAlign: 'center', margin: '4px 0 0 0' }}>
+        <div style={{ textAlign: 'center', margin: '2px 0 0 0' }}>
           <h2 style={{ fontSize: '20px', fontWeight: '800', margin: 0, color: '#ffffff' }}>
             Panel Principal
           </h2>
           <p style={{ fontSize: '13px', color: '#9ba1a2', margin: '4px 0 0 0' }}>
-            Selecciona una opción para operar
+            {!cajaEstado.abierta ? '🔒 Abre la caja para habilitar las funciones' : 'Selecciona una opción para operar'}
           </p>
         </div>
 
@@ -125,7 +228,7 @@ export default function DashboardOperador() {
         }}>
           {/* BOTÓN 1: VENTAS */}
           <button
-            onClick={() => navigate('/operador/ventas')}
+            onClick={() => manejarNavegacion('/operador/ventas')}
             style={{
               background: 'linear-gradient(145deg, #1b382b, #12281d)',
               border: '2px solid #2e7d58',
@@ -138,7 +241,6 @@ export default function DashboardOperador() {
               gap: '12px',
               cursor: 'pointer',
               boxShadow: '0 8px 20px rgba(46, 125, 88, 0.25)',
-              transition: 'transform 0.15s ease, border-color 0.15s ease',
               minHeight: '160px'
             }}
           >
@@ -167,7 +269,7 @@ export default function DashboardOperador() {
 
           {/* BOTÓN 2: EGRESOS */}
           <button
-            onClick={() => navigate('/operador/egresos')}
+            onClick={() => manejarNavegacion('/operador/egresos')}
             style={{
               background: 'linear-gradient(145deg, #3d1e24, #281216)',
               border: '2px solid #9e3646',
@@ -180,7 +282,6 @@ export default function DashboardOperador() {
               gap: '12px',
               cursor: 'pointer',
               boxShadow: '0 8px 20px rgba(158, 54, 70, 0.25)',
-              transition: 'transform 0.15s ease, border-color 0.15s ease',
               minHeight: '160px'
             }}
           >
@@ -209,7 +310,7 @@ export default function DashboardOperador() {
 
           {/* BOTÓN 3: CLIENTES */}
           <button
-            onClick={() => navigate('/operador/clientes')}
+            onClick={() => manejarNavegacion('/operador/clientes')}
             style={{
               background: 'linear-gradient(145deg, #1d2b38, #111a24)',
               border: '2px solid #336699',
@@ -222,7 +323,6 @@ export default function DashboardOperador() {
               gap: '12px',
               cursor: 'pointer',
               boxShadow: '0 8px 20px rgba(51, 102, 153, 0.25)',
-              transition: 'transform 0.15s ease, border-color 0.15s ease',
               minHeight: '160px'
             }}
           >
@@ -251,7 +351,7 @@ export default function DashboardOperador() {
 
           {/* BOTÓN 4: INVENTARIO */}
           <button
-            onClick={() => navigate('/operador/inventario')}
+            onClick={() => manejarNavegacion('/operador/inventario')}
             style={{
               background: 'linear-gradient(145deg, #332b18, #211b0e)',
               border: '2px solid #997a29',
@@ -264,7 +364,6 @@ export default function DashboardOperador() {
               gap: '12px',
               cursor: 'pointer',
               boxShadow: '0 8px 20px rgba(153, 122, 41, 0.25)',
-              transition: 'transform 0.15s ease, border-color 0.15s ease',
               minHeight: '160px'
             }}
           >
@@ -326,8 +425,227 @@ export default function DashboardOperador() {
         color: '#656d70',
         borderTop: '1px solid #1a2225'
       }}>
-        Agro Salto Mobile v1.0 • Conectado a Vercel
+        Agro Salto Mobile v1.0 • Conectado a Vercel & Supabase
       </footer>
+
+      {/* MODAL INTERACTIVO DE APERTURA OBLIGATORIA DE CAJA */}
+      {mostrarModalApertura && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0, 0, 0, 0.85)',
+          zIndex: 99999,
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            background: '#161f18',
+            borderTop: '3px solid #4db687',
+            borderRadius: '24px 24px 0 0',
+            width: '100%',
+            maxWidth: '500px',
+            padding: '24px 20px',
+            boxShadow: '0 -10px 40px rgba(0,0,0,0.8)',
+            maxHeight: '90vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '28px' }}>🔓</span>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '800', color: '#6ed1a7' }}>
+                    Apertura de Caja
+                  </h3>
+                  <div style={{ fontSize: '12px', color: '#9ba1a2' }}>
+                    Requerida para registrar ventas y movimientos
+                  </div>
+                </div>
+              </div>
+              <button 
+                onClick={() => setMostrarModalApertura(false)}
+                style={{
+                  background: '#202b23',
+                  border: '1px solid #2d4030',
+                  color: '#9ba1a2',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {errorApertura && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.2)',
+                border: '1px solid #ef4444',
+                color: '#ff9999',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                marginBottom: '16px',
+                fontWeight: '600'
+              }}>
+                ⚠️ {errorApertura}
+              </div>
+            )}
+
+            <form onSubmit={handleConfirmarApertura} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Selección de Caja */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>
+                  Caja a Abrir
+                </label>
+                <select
+                  value={cajaSeleccionada}
+                  onChange={(e) => setCajaSeleccionada(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#0e1610',
+                    border: '1px solid #2d4030',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
+                    color: '#f0fdf4',
+                    fontSize: '15px',
+                    fontWeight: '600'
+                  }}
+                >
+                  {cajasDisponibles.map(c => (
+                    <option key={c.id} value={c.id}>
+                      {c.nombre} - {c.filial_nombre || 'Filial Principal'}
+                    </option>
+                  ))}
+                  {cajasDisponibles.length === 0 && (
+                    <option value="1">Caja Principal 01</option>
+                  )}
+                </select>
+              </div>
+
+              {/* Monto Inicial en Guaraníes */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#cbd5e1', marginBottom: '6px' }}>
+                  Monto Inicial en Efectivo (₲)
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={montoInicial}
+                  onChange={(e) => {
+                    const num = Number(e.target.value.replace(/\D/g, '')) || 0
+                    setMontoInicial(num.toLocaleString('es-PY'))
+                  }}
+                  placeholder="0"
+                  style={{
+                    width: '100%',
+                    background: '#0e1610',
+                    border: '2px solid #4db687',
+                    borderRadius: '12px',
+                    padding: '14px',
+                    color: '#73e6b2',
+                    fontSize: '22px',
+                    fontWeight: '900',
+                    textAlign: 'right'
+                  }}
+                />
+
+                {/* Botones de suma rápida */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px', marginTop: '8px' }}>
+                  {[50000, 100000, 200000, 500000, 1000000].map(val => (
+                    <button
+                      key={val}
+                      type="button"
+                      onClick={() => sumarMontoRapido(val)}
+                      style={{
+                        background: '#1f2e22',
+                        border: '1px solid #2d4030',
+                        color: '#6ed1a7',
+                        borderRadius: '8px',
+                        padding: '8px 2px',
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      +{(val / 1000).toFixed(0)}k
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cotizaciones Opcionales */}
+              <div style={{
+                background: '#0d140f',
+                border: '1px solid #1f2d22',
+                borderRadius: '12px',
+                padding: '12px 14px'
+              }}>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: '#9ba1a2', marginBottom: '8px' }}>
+                  💱 Cotizaciones del Día (Opcional)
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#90caf9' }}>USD (₲)</label>
+                    <input
+                      type="number"
+                      value={cambioUsd}
+                      onChange={(e) => setCambioUsd(e.target.value)}
+                      style={{ width: '100%', background: '#161f18', border: '1px solid #2d4030', borderRadius: '8px', padding: '8px', color: '#fff', fontSize: '13px', fontWeight: '700' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#a7f3d0' }}>BRL (₲)</label>
+                    <input
+                      type="number"
+                      value={cambioBrl}
+                      onChange={(e) => setCambioBrl(e.target.value)}
+                      style={{ width: '100%', background: '#161f18', border: '1px solid #2d4030', borderRadius: '8px', padding: '8px', color: '#fff', fontSize: '13px', fontWeight: '700' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '11px', color: '#fde68a' }}>ARS (₲)</label>
+                    <input
+                      type="number"
+                      value={cambioArs}
+                      onChange={(e) => setCambioArs(e.target.value)}
+                      style={{ width: '100%', background: '#161f18', border: '1px solid #2d4030', borderRadius: '8px', padding: '8px', color: '#fff', fontSize: '13px', fontWeight: '700' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón de Confirmación */}
+              <button
+                type="submit"
+                disabled={abriendoCaja}
+                style={{
+                  background: 'linear-gradient(135deg, #10b981, #059669)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '14px',
+                  padding: '16px',
+                  fontSize: '16px',
+                  fontWeight: '800',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '6px'
+                }}
+              >
+                {abriendoCaja ? 'Abriendo Caja...' : '🔓 Confirmar Apertura e Iniciar Turno'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
+
