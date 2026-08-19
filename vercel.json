@@ -8,6 +8,10 @@
     "backend": {
       "entrypoint": "backend",
       "mount": "/_/backend"
+    },
+    "api": {
+      "entrypoint": "api",
+      "mount": "/api"
     }
   }
 }
