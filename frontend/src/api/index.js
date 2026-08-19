@@ -1,4 +1,12 @@
-const BASE = '/api'
+const isNative = typeof window !== 'undefined' && (
+  window.Capacitor?.isNativePlatform?.() ||
+  window.location.protocol === 'capacitor:' ||
+  (window.location.hostname === 'localhost' && !window.location.port)
+);
+
+export const BASE = isNative 
+  ? (localStorage.getItem('server_url') || 'https://agro-salto.vercel.app/api')
+  : '/api';
 
 function getToken() { return localStorage.getItem('token') }
 

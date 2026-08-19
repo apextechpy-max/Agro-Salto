@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import api from '../api'
 
 function tokenEsValido(token) {
   try {
@@ -32,13 +33,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (usuario, password) => {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ usuario, password })
-    })
-    const data = await res.json()
-    if (!res.ok) throw new Error(data.error || 'Error de login')
+    const data = await api.login(usuario, password)
     localStorage.setItem('token', data.token)
     localStorage.setItem('user', JSON.stringify(data.user))
     setUser(data.user)
