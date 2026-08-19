@@ -12,6 +12,8 @@ function tokenEsValido(token) {
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [modoPreferido, setModoPreferidoState] = useState(() => {
     return localStorage.getItem('modo_interfaz') || null
   })
@@ -30,7 +32,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   const login = async (usuario, password) => {
-    const res = await fetch('/_/backend/api/auth/login', {
+    const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuario, password })
