@@ -211,36 +211,81 @@ router.post('/', upload.single('foto'), async (req, res) => {
 });
 
 router.put('/:id', upload.single('foto'), async (req, res) => {
-  const { nombre, descripcion, categoria_id, unidad_medida, precio_costo, precio_venta_menor, precio_venta_mayor, iva_tipo, stock_minimo, requiere_receta, activo } = req.body;
-  try {
-    let foto_url = null;
-    let sql = `UPDATE productos SET nombre=$1, descripcion=$2, categoria_id=$3, unidad_medida=$4, precio_costo=$5, precio_venta_menor=$6, precio_venta_mayor=$7, iva_tipo=$8, stock_minimo=$9, requiere_receta=$10, activo=$11`;
-    const params = [
-      nombre.trim().toUpperCase(), 
-      (descripcion || '').trim().toUpperCase(), 
-      categoria_id || null, 
-      (unidad_medida || 'UNIDAD').trim().toUpperCase(),
-      precio_costo || 0, 
-      precio_venta_menor || 0, 
-      precio_venta_mayor || 0,
-      iva_tipo || '10', 
-      stock_minimo || 0, 
-      requiere_receta ? 1 : 0, 
-      activo !== undefined ? (activo ? 1 : 0) : 1
-    ];
+  const { id } = req.params;
+  const {
+    nombre,
+    descripcion,
+    categoria_id,
+    unidad_medida,
+    precio_costo,
+    precio_venta_menor,
+    precio_venta_mayor,
+    iva_tipo,
+    stock_minimo,
+    requiere_receta,
+    activo
+  } = req.body;
 
+  try {
+    const currRes = await db.query('SELECT * FROM productos WHERE id = $1', [id]);
+    if (currRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+    const current = currRes.rows[0];
+
+    let foto_url = current.foto_url;
     if (req.file) {
       foto_url = await uploadToSupabase(req.file);
-      sql += `, foto_url=$${params.length + 1}`;
-      params.push(foto_url);
     }
 
-    sql += ` WHERE id=$${params.length + 1}`;
-    params.push(req.params.id);
+    const nuevoNombre = nombre !== undefined && nombre !== null ? String(nombre).trim().toUpperCase() : current.nombre;
+    const nuevaDesc = descripcion !== undefined && descripcion !== null ? String(descripcion).trim().toUpperCase() : current.descripcion;
+    const nuevaCat = categoria_id !== undefined ? categoria_id : current.categoria_id;
+    const nuevaUnidad = unidad_medida !== undefined && unidad_medida !== null ? String(unidad_medida).trim().toUpperCase() : current.unidad_medida;
+    const nuevoCosto = precio_costo !== undefined && precio_costo !== null ? Number(precio_costo) : current.precio_costo;
+    const nuevaVentaMenor = precio_venta_menor !== undefined && precio_venta_menor !== null ? Number(precio_venta_menor) : current.precio_venta_menor;
+    const nuevaVentaMayor = precio_venta_mayor !== undefined && precio_venta_mayor !== null ? Number(precio_venta_mayor) : current.precio_venta_mayor;
+    const nuevoIva = iva_tipo !== undefined && iva_tipo !== null ? iva_tipo : current.iva_tipo;
+    const nuevoStockMin = stock_minimo !== undefined && stock_minimo !== null ? Number(stock_minimo) : current.stock_minimo;
+    const nuevoReceta = requiere_receta !== undefined ? (requiere_receta ? 1 : 0) : current.requiere_receta;
+    const nuevoActivo = activo !== undefined ? (activo ? 1 : 0) : current.activo;
 
-    await db.query(sql, params);
+    const sql = `
+      UPDATE productos SET
+        nombre = $1,
+        descripcion = $2,
+        categoria_id = $3,
+        unidad_medida = $4,
+        precio_costo = $5,
+        precio_venta_menor = $6,
+        precio_venta_mayor = $7,
+        iva_tipo = $8,
+        stock_minimo = $9,
+        requiere_receta = $10,
+        activo = $11,
+        foto_url = $12
+      WHERE id = $13
+    `;
+
+    await db.query(sql, [
+      nuevoNombre,
+      nuevaDesc,
+      nuevaCat,
+      nuevaUnidad,
+      nuevoCosto,
+      nuevaVentaMenor,
+      nuevaVentaMayor,
+      nuevoIva,
+      nuevoStockMin,
+      nuevoReceta,
+      nuevoActivo,
+      foto_url,
+      id
+    ]);
+
     res.json({ ok: true });
   } catch (err) {
+    console.error('Error al actualizar producto:', err);
     res.status(500).json({ error: err.message });
   }
 });

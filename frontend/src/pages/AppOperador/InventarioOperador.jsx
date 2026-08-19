@@ -121,8 +121,9 @@ export default function InventarioOperador() {
         if (venta > 0) {
           await api.updateProducto(productoSelId, {
             precio_venta_menor: venta,
+            precio_venta_mayor: venta,
             precio_costo: costo
-          }).catch(() => {})
+          })
         }
       } else {
         if (!nuevoNombre.trim()) throw new Error('Ingresa el nombre del nuevo producto')
