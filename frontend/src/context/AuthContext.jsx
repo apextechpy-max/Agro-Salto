@@ -20,12 +20,14 @@ export function AuthProvider({ children }) {
   })
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const saved = localStorage.getItem('user')
+    // Usamos sessionStorage para que al cerrar el aplicativo se borre la sesión y pida login de nuevo
+    const token = sessionStorage.getItem('token')
+    const saved = sessionStorage.getItem('user')
     if (token && saved && tokenEsValido(token)) {
       setUser(JSON.parse(saved))
-    } else if (token || saved) {
-      // Token vencido o inválido → limpiar y pedir re-login
+    } else {
+      // Limpiar datos obsoletos de sesión
+      sessionStorage.clear()
       localStorage.removeItem('token')
       localStorage.removeItem('user')
     }
@@ -34,13 +36,18 @@ export function AuthProvider({ children }) {
 
   const login = async (usuario, password) => {
     const data = await api.login(usuario, password)
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    // Guardar en sessionStorage (se destruye al cerrar la app)
+    sessionStorage.setItem('token', data.token)
+    sessionStorage.setItem('user', JSON.stringify(data.user))
+    // Limpiar localStorage por seguridad
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setUser(data.user)
     return data.user
   }
 
   const logout = () => {
+    sessionStorage.clear()
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     localStorage.removeItem('modo_interfaz')

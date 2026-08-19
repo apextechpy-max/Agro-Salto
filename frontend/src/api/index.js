@@ -8,7 +8,7 @@ export const BASE = isNative
   ? (localStorage.getItem('server_url') || 'https://agro-salto.vercel.app/api')
   : '/api';
 
-function getToken() { return localStorage.getItem('token') }
+function getToken() { return sessionStorage.getItem('token') || localStorage.getItem('token') }
 
 function headers(extra = {}) {
   return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}`, ...extra }
@@ -24,6 +24,7 @@ async function req(method, path, body) {
   const data = await res.json().catch(() => ({}))
   if (res.status === 401) {
     // Token vencido o inválido → cerrar sesión y volver al login
+    sessionStorage.clear()
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     window.location.href = '/'
