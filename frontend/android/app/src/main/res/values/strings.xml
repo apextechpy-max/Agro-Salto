@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Agro Salto</string>
+    <string name="title_activity_main">Agro Salto</string>
+    <string name="package_name">com.vet.app</string>
+    <string name="custom_url_scheme">com.vet.app</string>
+</resources>

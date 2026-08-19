@@ -1,5 +1,5 @@
 {
-  "appId": "com.agrosalto.app",
+  "appId": "com.vet.app",
   "appName": "Agro Salto",
   "webDir": "dist",
   "bundledWebRuntime": false,

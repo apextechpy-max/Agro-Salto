@@ -1,0 +1,34 @@
+{
+  "packageId": "com.vet.app",
+  "host": "agro-salto.vercel.app",
+  "name": "Agro Salto",
+  "launcherName": "Agro Salto",
+  "display": "standalone",
+  "themeColor": "#1A2225",
+  "navigationColor": "#121719",
+  "navigationColorDark": "#121719",
+  "navigationDividerColor": "#121719",
+  "navigationDividerColorDark": "#121719",
+  "backgroundColor": "#121719",
+  "enableNotifications": true,
+  "startUrl": "/operador",
+  "iconUrl": "https://agro-salto.vercel.app/assets/medallon_final.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.1",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://agro-salto.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": "true",
+  "isChromeOSOnly": false,
+  "isMetaQuest": false
+}

@@ -17,6 +17,8 @@ frontend/.env
 dist/
 frontend/dist/
 build/
+frontend/android/build/
+frontend/android/app/build/
 
 # Logs y temporales
 *.log
