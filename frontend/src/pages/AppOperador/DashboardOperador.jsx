@@ -416,16 +416,43 @@ export default function DashboardOperador() {
           </div>
         )}
 
+        {/* Botón para forzar actualización de la app */}
+        <div style={{ textAlign: 'center', marginTop: '12px' }}>
+          <button
+            onClick={() => {
+              if ('caches' in window) {
+                caches.keys().then(names => Promise.all(names.map(n => caches.delete(n)))).finally(() => {
+                  window.location.href = window.location.origin + '/operador?v=' + Date.now()
+                })
+              } else {
+                window.location.href = window.location.origin + '/operador?v=' + Date.now()
+              }
+            }}
+            style={{
+              background: '#151b1d',
+              color: '#9ba1a2',
+              border: '1px solid #283438',
+              borderRadius: '10px',
+              padding: '8px 14px',
+              fontSize: '11px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            🔄 Sincronizar / Recargar Versión
+          </button>
+        </div>
+
       </main>
 
       <footer style={{
-        padding: '16px',
+        padding: '14px',
         textAlign: 'center',
-        fontSize: '12px',
+        fontSize: '11px',
         color: '#656d70',
         borderTop: '1px solid #1a2225'
       }}>
-        Agro Salto Mobile v1.0 • Conectado a Vercel & Supabase
+        Agro Salto Mobile v1.0.4 • En línea con Vercel & Supabase
       </footer>
 
       {/* MODAL INTERACTIVO DE APERTURA OBLIGATORIA DE CAJA */}
