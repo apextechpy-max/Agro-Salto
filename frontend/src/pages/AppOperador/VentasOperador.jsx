@@ -25,7 +25,8 @@ export default function VentasOperador() {
 
   // Modal Recibo / Comprobante
   const [mostrarReciboModal, setMostrarReciboModal] = useState(false)
-  const [telefonoWhatsappRecibo, setTelefonoWhatsappRecibo] = useState('')
+  const [imagenVisorUrl, setImagenVisorUrl] = useState(null)
+  const [imagenVisorBlob, setImagenVisorBlob] = useState(null)
 
   // Modal Selector de Cantidad con Control de Stock
   const [prodParaAgregar, setProdParaAgregar] = useState(null)
@@ -249,55 +250,54 @@ export default function VentasOperador() {
         logging: false
       })
 
-      canvas.toBlob(async (blob) => {
+      canvas.toBlob((blob) => {
         if (!blob) {
           const imgData = canvas.toDataURL('image/png')
-          const win = window.open('')
-          if (win) {
-            win.document.write(`<title>Recibo #${exito?.id || ''} - Agro Salto</title><body style="margin:0;background:#0d1214;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:16px;box-sizing:border-box;"><img src="${imgData}" style="max-width:100%;max-height:92vh;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);" /></body>`)
-          } else {
-            const a = document.createElement('a')
-            a.href = imgData
-            a.download = `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`
-            a.click()
-          }
+          setImagenVisorUrl(imgData)
+          setImagenVisorBlob(null)
           return
         }
-
-        // Si el dispositivo soporta compartir archivos directamente (móviles / Android / iOS)
-        const file = new File([blob], `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`, { type: 'image/png' })
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          try {
-            await navigator.share({
-              files: [file],
-              title: `Recibo #${exito?.id} - Agro Salto`,
-              text: `Recibo de Venta #${exito?.id} - Agro Salto`
-            })
-            return
-          } catch (e) {
-            if (e.name === 'AbortError') return
-          }
-        }
-
-        // Abrir la imagen en nueva pestaña para ver, guardar o reenviar
         const url = URL.createObjectURL(blob)
-        const win = window.open(url, '_blank')
-        if (!win) {
-          // Si el navegador bloqueó la ventana emergente, forzar descarga directa
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`
-          a.target = '_blank'
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-        }
+        setImagenVisorUrl(url)
+        setImagenVisorBlob(blob)
       }, 'image/png')
     } catch (err) {
       alert('Error al generar imagen del recibo: ' + (err.message || err))
     } finally {
       setGenerandoImg(false)
     }
+  }
+
+  const compartirImagenVisor = async () => {
+    if (!imagenVisorBlob && !imagenVisorUrl) return
+    try {
+      if (imagenVisorBlob) {
+        const file = new File([imagenVisorBlob], `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`, { type: 'image/png' })
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `Recibo #${exito?.id} - Agro Salto`,
+            text: `Comprobante de compra #${exito?.id} - Agro Salto`
+          })
+          return
+        }
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return
+    }
+
+    // Fallback: descargar imagen directamente
+    descargarImagenVisor()
+  }
+
+  const descargarImagenVisor = () => {
+    if (!imagenVisorUrl) return
+    const a = document.createElement('a')
+    a.href = imagenVisorUrl
+    a.download = `Recibo_AgroSalto_${exito?.id || 'ticket'}.png`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
   }
 
   // Filtrado de clientes para el modal
@@ -1244,6 +1244,143 @@ export default function VentasOperador() {
               >
                 ✓ Listo / Cerrar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL VISOR DE IMAGEN ADAPTABLE CON COMPARTIR */}
+      {imagenVisorUrl && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.92)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1200,
+          padding: '14px',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <div style={{
+            background: '#121719',
+            border: '2px solid #10b981',
+            borderRadius: '24px',
+            padding: '16px',
+            width: '100%',
+            maxWidth: '390px',
+            maxHeight: '94vh',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '12px',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.9)',
+            overflowY: 'auto'
+          }}>
+            {/* Cabecera */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '20px' }}>📸</span>
+                <h3 style={{ margin: 0, color: '#6ed1a7', fontSize: '17px', fontWeight: '800' }}>
+                  Comprobante Listo
+                </h3>
+              </div>
+              <button
+                onClick={() => setImagenVisorUrl(null)}
+                style={{ background: '#283438', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Contenedor de la Imagen Adaptada a la pantalla del móvil */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              background: '#0d1214',
+              borderRadius: '16px',
+              padding: '10px',
+              border: '1px solid #233035',
+              overflow: 'hidden'
+            }}>
+              <img
+                src={imagenVisorUrl}
+                alt="Comprobante Agro Salto"
+                style={{
+                  width: '100%',
+                  maxWidth: '320px',
+                  maxHeight: '52vh',
+                  objectFit: 'contain',
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.5)'
+                }}
+              />
+            </div>
+
+            <div style={{ fontSize: '11px', color: '#9ba1a2', textAlign: 'center', lineHeight: '1.4' }}>
+              💡 Toca el botón verde para enviarlo a WhatsApp, o mantén presionada la imagen para guardarla.
+            </div>
+
+            {/* Botones de acción */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={compartirImagenVisor}
+                style={{
+                  background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  fontSize: '15px',
+                  fontWeight: '900',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 16px rgba(37, 211, 102, 0.4)'
+                }}
+              >
+                <span>📲</span> Compartir por WhatsApp
+              </button>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <button
+                  onClick={descargarImagenVisor}
+                  style={{
+                    background: '#1d262a',
+                    color: '#ffe082',
+                    border: '1px solid #4a3b1a',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>⬇️</span> Guardar
+                </button>
+
+                <button
+                  onClick={() => setImagenVisorUrl(null)}
+                  style={{
+                    background: '#283438',
+                    color: '#cbd5e1',
+                    border: '1px solid #3e4f55',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Volver
+                </button>
+              </div>
             </div>
           </div>
         </div>
