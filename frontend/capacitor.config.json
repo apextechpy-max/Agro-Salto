@@ -4,6 +4,8 @@
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
-    "androidScheme": "https"
+    "url": "https://agro-salto.vercel.app",
+    "cleartext": true
   }
 }
+
