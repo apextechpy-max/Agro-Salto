@@ -166,10 +166,18 @@ export default function DashboardOperador() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{
-            width: 44, height: 44, borderRadius: '50%',
-            overflow: 'hidden', border: '2px solid #4db687', background: '#0d1214'
+            width: 44,
+            height: 44,
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '22px',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+            flexShrink: 0
           }}>
-            <img src={medallonImg} alt="Agro Salto" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+            🌿
           </div>
           <div>
             <div style={{ fontSize: '17px', fontWeight: '800', color: '#6ed1a7', letterSpacing: '-0.3px' }}>

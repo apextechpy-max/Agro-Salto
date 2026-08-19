@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../api'
 import { useAuth } from '../../context/AuthContext'
+import jsPDF from 'jspdf'
 
 export default function VentasOperador() {
   const navigate = useNavigate()

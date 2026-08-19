@@ -62,7 +62,20 @@ export default function Layout() {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <img src={logoImg} alt="Logo" style={{ width: 38, height: 38, borderRadius: '50%', objectFit: 'contain' }} />
+            <div style={{
+              width: 38,
+              height: 38,
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+              flexShrink: 0
+            }}>
+              🌿
+            </div>
             <div>
               <div className="logo-name" style={{ fontSize: 17, fontWeight: 800 }}>Agro Salto</div>
               <div className="logo-sub" style={{ fontSize: 10, opacity: 0.7 }}>Consultorio & ERP</div>
