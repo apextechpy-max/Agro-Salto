@@ -225,6 +225,7 @@ export default function VentasOperador() {
       })
       setCarrito([])
       setMostrarCarritoModal(false)
+      setMostrarReciboModal(true)
     } catch (err) {
       setError(err.message || 'Error al procesar la venta')
     } finally {
@@ -376,10 +377,7 @@ export default function VentasOperador() {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
             <button
-              onClick={() => {
-                setTelefonoWhatsappRecibo(exito.clienteTel || '')
-                setMostrarReciboModal(true)
-              }}
+              onClick={() => setMostrarReciboModal(true)}
               style={{
                 background: 'linear-gradient(135deg, #d4af37, #f39c12)',
                 color: '#000',

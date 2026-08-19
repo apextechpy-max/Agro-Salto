@@ -39,6 +39,23 @@ export default function EgresosOperador() {
   const [procesando, setProcesando] = useState(false)
   const [error, setError] = useState('')
   const [exito, setExito] = useState(false)
+  const [egresosLista, setEgresosLista] = useState([])
+  const [loadingEgresos, setLoadingEgresos] = useState(false)
+
+  const cargarMovimientos = async (apId) => {
+    if (!apId) return
+    try {
+      setLoadingEgresos(true)
+      const movs = await api.movimientosCaja(apId)
+      const arr = Array.isArray(movs) ? movs : (movs?.movimientos || [])
+      const soloEgresos = arr.filter(m => (m.tipo || '').toUpperCase() === 'EGRESO')
+      setEgresosLista(soloEgresos)
+    } catch (e) {
+      console.error('Error al cargar egresos:', e)
+    } finally {
+      setLoadingEgresos(false)
+    }
+  }
 
   useEffect(() => {
     // Cargar la apertura activa de caja
@@ -60,6 +77,7 @@ export default function EgresosOperador() {
         }
         if (apActiva) {
           setApertura(apActiva)
+          cargarMovimientos(apActiva.id)
         } else {
           setError('No hay una caja abierta para registrar egresos')
         }
@@ -123,6 +141,8 @@ export default function EgresosOperador() {
         concepto: conceptoFinal,
         medio_pago: medioPago
       })
+
+      await cargarMovimientos(apertura.id)
 
       setExito(true)
       setMonto('')
@@ -509,6 +529,93 @@ export default function EgresosOperador() {
             </button>
           </form>
         )}
+
+        {/* SECCIÓN INFERIOR: HISTORIAL DE EGRESOS REGISTRADOS EN ESTE TURNO */}
+        <div style={{
+          marginTop: '26px',
+          borderTop: '2px dashed #28373c',
+          paddingTop: '20px',
+          paddingBottom: '20px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '18px' }}>📋</span>
+              <h3 style={{ margin: 0, fontSize: '15px', fontWeight: '800', color: '#ff9ebb', letterSpacing: '-0.3px' }}>
+                Egresos de este Turno ({egresosLista.length})
+              </h3>
+            </div>
+            {egresosLista.length > 0 && (
+              <span style={{ fontSize: '13px', fontWeight: '900', color: '#ff6b6b' }}>
+                - ₲ {egresosLista.reduce((sum, e) => sum + Number(e.monto || 0), 0).toLocaleString('es-PY')}
+              </span>
+            )}
+          </div>
+
+          {loadingEgresos ? (
+            <div style={{ textAlign: 'center', padding: '16px', color: '#9ba1a2', fontSize: '13px' }}>
+              Cargando egresos...
+            </div>
+          ) : egresosLista.length === 0 ? (
+            <div style={{
+              background: '#1a2225',
+              borderRadius: '12px',
+              padding: '16px',
+              textAlign: 'center',
+              color: '#8c9ba0',
+              fontSize: '13px',
+              border: '1px dashed #2f3e43'
+            }}>
+              No hay egresos registrados todavía en este turno de caja.
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {egresosLista.map((eg, idx) => (
+                <div
+                  key={eg.id || idx}
+                  style={{
+                    background: '#1a2225',
+                    border: '1px solid #3e262c',
+                    borderRadius: '12px',
+                    padding: '12px 14px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '65%' }}>
+                    <div style={{ fontSize: '13px', fontWeight: '800', color: '#f0f3f4', wordBreak: 'break-word' }}>
+                      {eg.concepto || 'Egreso de Caja'}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: '#8c9ba0' }}>
+                      <span>🕒 {new Date(eg.created_at || eg.fecha || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>•</span>
+                      <span style={{
+                        background: eg.medio_pago === 'TRANSFERENCIA' ? '#1f2e3d' : '#2b231d',
+                        color: eg.medio_pago === 'TRANSFERENCIA' ? '#90caf9' : '#ffb74d',
+                        padding: '2px 6px',
+                        borderRadius: '6px',
+                        fontWeight: '700',
+                        fontSize: '10px'
+                      }}>
+                        {eg.medio_pago || 'EFECTIVO'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div style={{
+                    fontSize: '15px',
+                    fontWeight: '900',
+                    color: '#ff6b6b',
+                    textAlign: 'right'
+                  }}>
+                    - ₲ {Number(eg.monto || 0).toLocaleString('es-PY')}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
