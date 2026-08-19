@@ -21,6 +21,10 @@ export default function VentasOperador() {
   const [exito, setExito] = useState(null)
   const [mostrarCarritoModal, setMostrarCarritoModal] = useState(false)
 
+  // Modal Recibo / Comprobante
+  const [mostrarReciboModal, setMostrarReciboModal] = useState(false)
+  const [telefonoWhatsappRecibo, setTelefonoWhatsappRecibo] = useState('')
+
   // Modal Selector de Cantidad con Control de Stock
   const [prodParaAgregar, setProdParaAgregar] = useState(null)
   const [cantParaAgregar, setCantParaAgregar] = useState(1)
@@ -206,10 +210,15 @@ export default function VentasOperador() {
       const res = await api.createVenta(payload)
       setExito({
         ...res,
+        id: res.id || res.venta_id || Date.now().toString().slice(-6),
         totalCobrado: totalVenta,
-        cantItems: carrito.reduce((a, b) => a + b.cantidad, 0),
+        itemsComprados: [...carrito],
         clienteNombre: clienteSel?.razon_social || clienteSel?.nombre || 'Cliente Ocasional',
-        formaPago
+        clienteRuc: clienteSel?.ruc || clienteSel?.documento || '',
+        clienteTel: clienteSel?.telefono || '',
+        formaPago,
+        tipoComprobante,
+        fecha: new Date()
       })
       setCarrito([])
       setMostrarCarritoModal(false)
@@ -218,6 +227,35 @@ export default function VentasOperador() {
     } finally {
       setProcesando(false)
     }
+  }
+
+  const enviarReciboWhatsapp = () => {
+    if (!exito) return
+    const tel = (telefonoWhatsappRecibo || exito.clienteTel || '').replace(/\D/g, '')
+    
+    let msg = `🐾 *AGRO SALTO - COMPROBANTE DE VENTA*\n`
+    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
+    msg += `🧾 *Recibo N°:* #${exito.id || '001'}\n`
+    msg += `📅 *Fecha:* ${new Date(exito.fecha || Date.now()).toLocaleString('es-PY')}\n`
+    msg += `👤 *Cliente:* ${exito.clienteNombre || 'Cliente Ocasional'}\n`
+    if (exito.clienteRuc) msg += `📄 *RUC/CI:* ${exito.clienteRuc}\n`
+    msg += `💳 *Pago:* ${exito.formaPago || 'EFECTIVO'}\n`
+    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
+    msg += `*DETALLE DE COMPRA:*\n`
+    
+    (exito.itemsComprados || []).forEach((it, idx) => {
+      msg += `${idx + 1}. ${it.nombre}\n   ${it.cantidad} ${it.unidad_medida || 'UN'} × ₲ ${(it.precio || 0).toLocaleString('es-PY')} = *₲ ${(it.cantidad * it.precio).toLocaleString('es-PY')}*\n`
+    })
+    
+    msg += `━━━━━━━━━━━━━━━━━━━━━\n`
+    msg += `💰 *TOTAL PAGADO: ₲ ${Number(exito.totalCobrado || 0).toLocaleString('es-PY')}*\n\n`
+    msg += `¡Muchas gracias por su preferencia! 🐶🐱🌾`
+
+    const url = tel 
+      ? `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`
+      : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`
+      
+    window.open(url, '_blank')
   }
 
   // Filtrado de clientes para el modal
@@ -294,35 +332,65 @@ export default function VentasOperador() {
           <div style={{ fontSize: '13px', color: '#a2e8c6', marginBottom: '16px' }}>
             Cliente: <strong>{exito.clienteNombre || 'Cliente Ocasional'}</strong> • Pago: <strong>{exito.formaPago || 'EFECTIVO'}</strong>
           </div>
-          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
             <button
-              onClick={() => setExito(null)}
+              onClick={() => {
+                setTelefonoWhatsappRecibo(exito.clienteTel || '')
+                setMostrarReciboModal(true)
+              }}
               style={{
-                background: '#4db687',
+                background: 'linear-gradient(135deg, #d4af37, #f39c12)',
                 color: '#000',
-                fontWeight: '800',
+                fontWeight: '900',
                 border: 'none',
-                padding: '12px 20px',
-                borderRadius: '10px',
-                cursor: 'pointer'
+                padding: '14px 20px',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                boxShadow: '0 4px 15px rgba(212, 175, 55, 0.4)'
               }}
             >
-              Nueva Venta 🛒
+              <span>🧾</span> Generar / Enviar Recibo al Cliente
             </button>
-            <button
-              onClick={() => navigate('/operador')}
-              style={{
-                background: '#283438',
-                color: '#fff',
-                fontWeight: '700',
-                border: 'none',
-                padding: '12px 20px',
-                borderRadius: '10px',
-                cursor: 'pointer'
-              }}
-            >
-              Menú Principal 🏠
-            </button>
+
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={() => setExito(null)}
+                style={{
+                  flex: 1,
+                  background: '#4db687',
+                  color: '#000',
+                  fontWeight: '800',
+                  border: 'none',
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Nueva Venta 🛒
+              </button>
+              <button
+                onClick={() => navigate('/operador')}
+                style={{
+                  flex: 1,
+                  background: '#283438',
+                  color: '#fff',
+                  fontWeight: '700',
+                  border: 'none',
+                  padding: '12px 14px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Menú Principal 🏠
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -991,6 +1059,191 @@ export default function VentasOperador() {
             >
               Listo / Volver a Productos
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL RECIBO DIGITAL Y ENVÍO POR WHATSAPP */}
+      {mostrarReciboModal && exito && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(0,0,0,0.85)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1100,
+          padding: '16px',
+          backdropFilter: 'blur(4px)'
+        }}>
+          <div style={{
+            background: '#1a2225',
+            border: '2px solid #d4af37',
+            borderRadius: '24px',
+            padding: '20px',
+            width: '100%',
+            maxWidth: '430px',
+            maxHeight: '92vh',
+            overflowY: 'auto',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            {/* Header Modal */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '22px' }}>🧾</span>
+                <h3 style={{ margin: 0, color: '#ffe082', fontSize: '18px', fontWeight: '800' }}>
+                  Comprobante de Venta
+                </h3>
+              </div>
+              <button
+                onClick={() => setMostrarReciboModal(false)}
+                style={{ background: '#283438', border: 'none', color: '#fff', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '14px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Ticket Impreso / Recibo Preview */}
+            <div style={{
+              background: '#ffffff',
+              color: '#000000',
+              borderRadius: '14px',
+              padding: '18px 16px',
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+              lineHeight: '1.4'
+            }}>
+              <div style={{ textAlign: 'center', borderBottom: '2px dashed #333', paddingBottom: '10px', marginBottom: '10px' }}>
+                <div style={{ fontSize: '16px', fontWeight: '900', letterSpacing: '1px' }}>AGRO SALTO</div>
+                <div style={{ fontSize: '11px', color: '#555' }}>Veterinaria & Agroganadera</div>
+                <div style={{ fontSize: '11px', color: '#555', marginTop: '4px' }}>Salto del Guairá, Paraguay</div>
+                <div style={{ fontSize: '12px', fontWeight: '800', marginTop: '6px' }}>RECIBO DE VENTA #{exito.id}</div>
+                <div style={{ fontSize: '11px', color: '#666' }}>{new Date(exito.fecha || Date.now()).toLocaleString('es-PY')}</div>
+              </div>
+
+              <div style={{ fontSize: '12px', marginBottom: '10px', borderBottom: '1px solid #ddd', paddingBottom: '8px' }}>
+                <div><strong>Cliente:</strong> {exito.clienteNombre || 'Cliente Ocasional'}</div>
+                {exito.clienteRuc && <div><strong>RUC/CI:</strong> {exito.clienteRuc}</div>}
+                <div><strong>Pago:</strong> {exito.formaPago || 'EFECTIVO'}</div>
+              </div>
+
+              {/* Items */}
+              <div style={{ borderBottom: '2px dashed #333', paddingBottom: '10px', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '11px', borderBottom: '1px solid #eee', paddingBottom: '4px', marginBottom: '6px' }}>
+                  <span>CANT / DESCRIPCIÓN</span>
+                  <span>TOTAL</span>
+                </div>
+                {(exito.itemsComprados || []).map((it, idx) => (
+                  <div key={idx} style={{ marginBottom: '6px' }}>
+                    <div style={{ fontWeight: '700' }}>{it.nombre}</div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#444' }}>
+                      <span>{it.cantidad} {it.unidad_medida || 'UN'} × ₲ {(it.precio || 0).toLocaleString('es-PY')}</span>
+                      <strong style={{ color: '#000' }}>₲ {(it.cantidad * it.precio).toLocaleString('es-PY')}</strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total Final */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '16px', fontWeight: '900', padding: '4px 0' }}>
+                <span>TOTAL A PAGAR:</span>
+                <span style={{ fontSize: '18px' }}>₲ {Number(exito.totalCobrado || 0).toLocaleString('es-PY')}</span>
+              </div>
+
+              <div style={{ textAlign: 'center', fontSize: '10px', color: '#666', marginTop: '12px', borderTop: '1px dashed #ccc', paddingTop: '8px' }}>
+                ¡Gracias por su preferencia! 🐾🌾
+              </div>
+            </div>
+
+            {/* Sección Enviar por WhatsApp */}
+            <div style={{
+              background: '#121719',
+              borderRadius: '14px',
+              padding: '14px',
+              border: '1px solid #283438',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              <label style={{ fontSize: '12px', fontWeight: '700', color: '#6ed1a7' }}>
+                📱 Número de WhatsApp del Cliente
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: 0981 123456 o 595981123456"
+                value={telefonoWhatsappRecibo}
+                onChange={e => setTelefonoWhatsappRecibo(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: '#1a2225',
+                  border: '1px solid #2e7d58',
+                  borderRadius: '10px',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  boxSizing: 'border-box'
+                }}
+              />
+              <button
+                onClick={enviarReciboWhatsapp}
+                style={{
+                  background: 'linear-gradient(135deg, #25D366, #128C7E)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  fontSize: '15px',
+                  fontWeight: '900',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)'
+                }}
+              >
+                <span>💬</span> Enviar Recibo por WhatsApp
+              </button>
+            </div>
+
+            {/* Acciones Adicionales */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+              <button
+                onClick={() => window.print()}
+                style={{
+                  background: '#242f33',
+                  color: '#fff',
+                  border: '1px solid #3a4a50',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                🖨️ Imprimir / PDF
+              </button>
+              <button
+                onClick={() => setMostrarReciboModal(false)}
+                style={{
+                  background: '#d4af37',
+                  color: '#000',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '12px',
+                  fontSize: '13px',
+                  fontWeight: '800',
+                  cursor: 'pointer'
+                }}
+              >
+                ✓ Listo / Cerrar
+              </button>
+            </div>
           </div>
         </div>
       )}
