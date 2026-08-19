@@ -336,6 +336,7 @@ CREATE TABLE IF NOT EXISTS agenda (
 -- 9. Insertar datos iniciales básicos
 INSERT INTO filiales (nombre, direccion, activa) VALUES ('Casa Central', 'Dirección Central', 1);
 INSERT INTO usuarios (usuario, password_hash, nombre_completo, perfil, filial_id, activo) 
-VALUES ('admin', '$2a$10$X87dZ9R9E1eG9IuI7uI9u.vR1R7E7E7E7E7E7E7E7E7E7E7E7E7E', 'Administrador', 'ADMIN', 1, 1);
--- Nota: La contraseña del admin arriba es un hash de ejemplo. Deberás resetearla o usar la tuya.
+VALUES ('admin', '$2a$10$9UaHbottCM49odk5EWsZSuzUL8AaDw4YuzWaX10X/dy2z7f4Ddz2O', 'Administrador Principal', 'ADMIN', 1, 1)
+ON CONFLICT (usuario) DO UPDATE SET password_hash = EXCLUDED.password_hash;
+-- Contraseña por defecto: admin123
 INSERT INTO cajas (nombre, filial_id, activa) VALUES ('Caja Principal', 1, 1);
